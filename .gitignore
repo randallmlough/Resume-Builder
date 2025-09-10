@@ -1,0 +1,32 @@
+# Archieve
+Archieve/
+
+## Core latex/pdflatex auxiliary files:
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+
+# github action result
+semicolon_delimited_script
+
+dist/**
+!.gitkeep
+
+.idea
+.DS_Store
+.env
+
+# can remove from here if using Overleaf or if private repo. Excluding for public repo since it includes personal info
+resume.tex
+
+# temporarly ignoring claude notes
+CLAUDE.md

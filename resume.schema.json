@@ -1,0 +1,226 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/resume.schema.json",
+  "title": "Resume Schema",
+  "description": "Schema for a professional resume in JSON format",
+  "type": "object",
+  "required": ["name", "contact", "summary"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Full name of the person"
+    },
+    "contact": {
+      "type": "object",
+      "description": "Contact information",
+      "required": ["email"],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number"
+        },
+        "linkedin": {
+          "type": "string",
+          "description": "LinkedIn profile URL or handle"
+        },
+        "github": {
+          "type": "string",
+          "description": "GitHub profile URL or handle"
+        },
+        "website": {
+          "type": "string",
+          "format": "uri",
+          "description": "Personal website URL"
+        }
+      }
+    },
+    "summary": {
+      "type": "string",
+      "description": "Professional summary or overview"
+    },
+    "experience": {
+      "type": "array",
+      "description": "Work experience",
+      "items": {
+        "type": "object",
+        "required": ["company", "positions"],
+        "properties": {
+          "company": {
+            "type": "string",
+            "description": "Company name"
+          },
+          "location": {
+            "type": "string",
+            "description": "Company location"
+          },
+          "positions": {
+            "type": "array",
+            "description": "Positions held at the company",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["title", "startDate"],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "Job title"
+                },
+                "startDate": {
+                  "type": "string",
+                  "description": "Start date (e.g., 'June 2021')"
+                },
+                "endDate": {
+                  "type": "string",
+                  "description": "End date (e.g., 'March 2023' or 'Present')"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["full-time", "part-time", "contract", "internship", "freelance", "temporary", "volunteer"],
+                  "description": "Employment type (e.g., Full-time, Part-time, Contract)"
+                },
+                "responsibilities": {
+                  "type": "array",
+                  "description": "List of responsibilities and achievements",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "projects": {
+      "type": "array",
+      "description": "Personal or professional projects",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Project name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Project description"
+          },
+          "technologies": {
+            "type": "array",
+            "description": "Technologies used in the project",
+            "items": {
+              "type": "string"
+            }
+          },
+          "github": {
+            "type": "string",
+            "format": "uri",
+            "description": "GitHub repository URL"
+          },
+          "website": {
+            "type": "string",
+            "format": "uri",
+            "description": "Project website URL"
+          },
+          "items": {
+            "type": "array",
+            "description": "Project highlights or features",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "education": {
+      "type": "array",
+      "description": "Educational background",
+      "items": {
+        "type": "object",
+        "required": ["institution", "degree"],
+        "properties": {
+          "institution": {
+            "type": "string",
+            "description": "Educational institution name"
+          },
+          "college": {
+            "type": "string",
+            "description": "College or school within the institution"
+          },
+          "degree": {
+            "type": "string",
+            "description": "Degree obtained"
+          },
+          "fieldOfStudy": {
+            "type": "string",
+            "description": "Field of study or major"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Start year"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "End year"
+          },
+          "location": {
+            "type": "string",
+            "description": "Location of the institution"
+          },
+          "gpa": {
+            "type": "string",
+            "description": "GPA (optional)"
+          }
+        }
+      }
+    },
+    "skills": {
+      "type": "array",
+      "description": "Technical skills and competencies",
+      "items": {
+        "type": "object",
+        "required": ["name", "category"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Skill name"
+          },
+          "level": {
+            "type": "string",
+            "enum": ["Beginner", "Intermediate", "Advanced", "Expert", "beginner", "intermediate", "advanced", "expert"],
+            "description": "Proficiency level"
+          },
+          "years": {
+            "type": "string",
+            "description": "Years of experience"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "Programming Languages",
+              "Frameworks and Libraries",
+              "Databases",
+              "CI/CD, Infra, Monitoring",
+              "Tools",
+              "Other"
+            ],
+            "description": "Skill category"
+          },
+          "keywords": {
+            "type": "array",
+            "description": "Related keywords or technologies",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,207 @@
+{{- /*gotype: resume.Resume*/ -}}
+%-------------------------
+% Resume in LateX
+% Author : Randy Lough
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{xcolor}
+
+% Define custom colors
+\definecolor{accentColor}{HTML}{ {{- .Config.AccentColor}}}
+
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontspec}
+
+%----------FONT OPTIONS----------
+\setmainfont{merriweather-sans} % Clean sans-serif for body text
+\newfontfamily\headingfont{merriweather} % Elegant serif for headings
+\newfontfamily\serifFont{merriweather} % Alternative serif option
+
+%   Professional Sans-serif fonts:
+%   \setmainfont{DejaVu Sans} % Clean, modern
+%   \setmainfont{Liberation Sans} % Arial alternative
+%   \setmainfont{Carlito} % Calibri alternative
+%   \setmainfont{Clear Sans} % Very clean, modern
+%   \setmainfont{Arimo} % Clean sans-serif
+%
+%   Professional Serif fonts:
+%   \setmainfont{DejaVu Serif} % Classic serif
+%   \setmainfont{Liberation Serif} % Times alternative
+%   \setmainfont{Crimson Pro} % Modern serif
+%   \setmainfont{Cormorant Garamond} % Elegant serif - fav
+
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+\vspace{-4pt}\headingfont\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+{{/*Ensure that generate PDF is machine readable/ATS parsable. Enable if using pdflatex, but keep commented out if using luatex.*/}}
+%\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+    \item\small{
+        {#1 \vspace{-2pt}}
+    }
+}
+% Just in case someone needs a heading that does not need to be in a list
+\newcommand{\resumeHeading}[3]{
+    \begin{tabular*}{0.99\textwidth}[t]{l@{\extracolsep{\fill}}r}
+        \textbf{#1} \\
+        \textit{\small#2} & \textit{\small #3} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeSubheadingLocation}[3]{
+    \vspace{-1pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+        \textbf{#1} & #2 \\
+        \textit{\small#3} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeSubheading}[3]{
+    \vspace{-1pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+        \textcolor{accentColor}{\textbf{\large#1}} \\
+        \textit{\small#2} & \textit{\small #3} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+        \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+        \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[2]{\resumeItem{#1}{#2}\vspace{-4pt}}
+
+% \renewcommand{\labelitemii}{$\circ$}
+\renewcommand{\labelitemii}{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=*, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}\vspace{4pt}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{4pt}} %vspace{-5pt}
+
+%-------------------------------------------
+%%%%%%  CV STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+%----------HEADING-----------------
+\begin{center}
+{\headingfont\textcolor{accentColor}{\textbf{\Huge \scshape {{.Name}}}}} \\ \vspace{1pt}
+\small \href{tel:{{.Contact.Phone}}}{ {{- .Contact.Phone}}} $|$ \href{mailto:{{.Contact.Email}}}{ {{- .Contact.Email}}} $|$
+\href{https://www.{{.Contact.LinkedIn}}}{ {{- .Contact.LinkedIn}}} $|$
+\href{https://www.{{.Contact.GitHub}}}{ {{- .Contact.GitHub}}}
+\end{center}
+
+%-----------OVERVIEW-----------------
+\section{Overview}
+\small {{latexEscape .Summary}}
+
+%-----------EXPERIENCE-----------------
+\section{Experience}
+\resumeSubHeadingListStart
+{{ range $experience :=.Experience -}}
+    {{ range $index, $position := $experience.Positions -}}
+        {{ if eq $index 0 -}}
+            \resumeSubheading
+                { {{- $experience.Company}}}%{ {{- $experience.Location}}}
+                { {{- $position.Title}}{{if ne $position.Type ""}} ({{$position.Type}}){{end}}}{ {{- $position.StartDate}} — {{- $position.EndDate}}}
+            \resumeItemListStart
+            {{- range $position.Responsibilities }}
+                \resumeItem{ {{- latexEscape .}} }
+            {{- end }}
+            \resumeItemListEnd
+        {{ else -}}
+            \resumeSubSubheading
+            { {{- $position.Title}}}{ {{- $position.StartDate}} — {{- $position.EndDate}}}
+            \resumeItemListStart
+            {{- range $position.Responsibilities }}
+                \resumeItem{ {{- latexEscape .}} }
+            {{- end }}
+            \resumeItemListEnd
+        {{ end -}}
+    {{ end -}}
+{{ end -}}
+\resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{Projects}
+\resumeSubHeadingListStart
+{{ range .Projects -}}
+    \resumeProjectHeading
+    {\textbf{ {{- .Name}}} $|$ \emph{ {{- join .Technology ", "}}}}{ \href{ {{- .Github}}}{\underline{Github}}}
+    %\small{ { {{- .Description}} \vspace{2pt}}}
+    \resumeItemListStart
+        {{- range .Items }}
+            \resumeItem{ {{- latexEscape .}} }
+        {{- end }}
+    \resumeItemListEnd
+{{ end -}}
+\resumeSubHeadingListEnd
+
+%--------SKILLS------------
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+\small{\item{
+{{- range $cat := (orderedSkills .Skills) }}
+    \textbf{ {{- $cat.Name}}}{: {{ range $i, $v := $cat.Values }}{{if $i}}, {{end}}{{$v}}{{end}}} \\
+{{- end }}
+}}
+\end{itemize}
+
+%-----------EDUCATION-----------------
+\section{Education}
+\resumeSubHeadingListStart
+{{- range .Education}}
+    \resumeSubheadingLocation
+    { {{- .Institution}}{{if ne .College ""}}, {{.College}}{{end}}}{ {{- .StartDate}} — {{.EndDate}}}
+    { {{- .Degree}}{{if ne .GPA ""}}; GPA: {{.GPA}}{{end}}}
+{{ end -}}
+\resumeSubHeadingListEnd
+
+%-------------------------------------------
+\end{document}

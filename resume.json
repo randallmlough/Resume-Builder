@@ -1,0 +1,326 @@
+{
+  "$schema": "./resume.schema.json",
+  "name": "Randall Lough",
+  "contact": {
+    "email": "REDACTED",
+    "phone": "REDACTED",
+    "linkedin": "linkedin.com/in/randallmckenna",
+    "github": "github.com/randallmlough",
+    "website": "https://www.randyLough.com"
+  },
+  "summary": "Highly skilled and motivated software engineer with over 8 years of experience designing, developing, and deploying websites, web applications, tools, and libraries in a variety of languages. Proven track record of quickly learning complex concepts, delivering high-quality work, and collaborating with cross-functional teams to ensure successful project outcomes.",
+  "experience": [
+    {
+      "company": "Appraisal Desk",
+      "location": "Remote",
+      "positions": [
+        {
+          "title": "Freelance Software Engineer",
+          "startDate": "June 2025",
+          "endDate": "Present",
+          "type": "part-time",
+          "responsibilities": [
+            "Developed organizations testing strategy by using a mixture of unit, integration, and end-to-end tests to ensure application reliability and maintainability.",
+            "Implemented CI/CD pipelines using GitHub Actions, improving deployment efficiency and reliability.",
+            "Architected end-to-end testing using Playwright, enhancing application stability and reduced regression issues."
+          ]
+        }
+      ]
+    },
+    {
+      "company": "Zena",
+      "location": "Remote",
+      "positions": [
+        {
+          "title": "Senior Software Engineer",
+          "startDate": "July 2025",
+          "endDate": "September 2025",
+          "responsibilities": [
+            "Led end-to-end development of AI/LLM Agent UI Chat System, a critical AI feature that became the foundation for all AI conversations at Zena, involving technical planning, proof-of-concept development, and full implementation.",
+            "Established frontend best practices and became team's HTMX subject matter expert, creating patterns and standards that improved team velocity and code quality across major feature releases.",
+            "Designed and built future-proof dynamic tool system that replaced rigid static architecture, enabling flexible AI agent capabilities and unblocking product development for advanced features.",
+            "Delivered proactive technical solutions including entitlements system architecture that anticipated future business needs beyond simple enabled/disabled checks to support numerical limits and complex permissions."
+          ]
+        },
+        {
+          "title": "Software Engineer",
+          "startDate": "October 2023",
+          "endDate": "July 2025",
+          "responsibilities": [
+            "Delivered key product features, collaborating cross-functionally with product teams to scope requirements and ensure timely delivery with minimal obstacles.",
+            "Implemented backend search functionality using OpenSearch for import transactions feature, contributing to smooth project execution and improved user experience.",
+            "Enhanced developer experience by introducing GraphQL schema validation CI process and implemented error handling patterns.",
+            "Pioneered on-call program development, helping establish and refine processes before scaling to additional team members, demonstrating leadership in operational excellence.",
+            "Led technical presentations on GraphQL vs REST architecture decisions, facilitating team knowledge sharing and strategic technology discussions."
+          ]
+        }
+      ]
+    },
+    {
+      "company": "Beam",
+      "location": "Remote",
+      "positions": [
+        {
+          "title": "Software Engineer",
+          "startDate": "June 2021",
+          "endDate": "March 2023",
+          "responsibilities": [
+            "Led frontend application rewrite using TypeScript and Next.js, improving codebase maintainability, scalability, and enabling 40% faster feature development cycles.",
+            "Architected and developed high-performance internal CLI tool using Go, implementing comprehensive test suites and robust CI/CD pipeline for enterprise-scale deployment.",
+            "Mentored engineering team on TypeScript, Next.js, and modern frontend development practices, accelerating team adoption of new technologies and best practices.",
+            "Provided technical guidance and mentorship to junior developers, particularly in Go language proficiency and system design principles."
+          ]
+        },
+        {
+          "title": "Support Engineer",
+          "startDate": "October 2020",
+          "endDate": "June 2021",
+          "responsibilities": [
+            "Implemented comprehensive testing strategies that improved application stability, reduced production bugs, and enhanced future compatibility.",
+            "Enhanced application security, performance, and maintainability through continuous architecture improvements and code optimization.",
+            "Maintained and improved existing codebases, ensuring code quality and performance."
+          ]
+        }
+      ]
+    },
+    {
+      "company": "RetailOps",
+      "location": "San Diego, CA",
+      "positions": [
+        {
+          "title": "Marketing Manager and Web Developer",
+          "startDate": "June 2018",
+          "endDate": "August 2019",
+          "responsibilities": [
+            "Designed, built, and deployed custom marketing website from scratch, saving tens of thousands in development costs while improving mobile responsiveness and user conversion funnels.",
+            "Developed and executed multi-channel marketing strategy that established company as industry thought leader, achieving 35% month-over-month growth in organic search traffic.",
+            "Drove exceptional business growth with 840% increase in demo requests and 1500% increase in contract generation through integrated content marketing campaigns.",
+            "Created comprehensive content marketing portfolio including blog posts, ebooks, case studies, videos, webinars, and paid advertisements to support lead generation."
+          ]
+        },
+        {
+          "title": "Inbound Marketing Specialist",
+          "startDate": "June 2016",
+          "endDate": "June 2018",
+          "responsibilities": [
+            "Designed, built, and measured landing pages, email campaigns, and paid advertisements using HubSpot, Google Ads, and LinkedIn Ads to drive lead generation.",
+            "Developed content strategy and marketing materials to promote integrated retail operations platform including POM, PIM, DOM, WMS, and mobile applications.",
+            "Managed lead generation and nurturing processes through content marketing, SEO optimization, and marketing automation workflows.",
+            "Analyzed campaign performance metrics and customer acquisition data to optimize marketing funnel conversion rates."
+          ]
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Resume Builder",
+      "description": "A simple resume builder that takes a JSON object and generates a modern, AST friendly resume using Go and LaTex.",
+      "technologies": ["Go", "LaTex"],
+      "github": "https://github.com/randallmlough/code-bot",
+      "items": [
+        "Designed a resume builder application using Go and LaTex, enabling myself (and others) to create professional resumes from structured JSON data.",
+        "This resume you are currently viewing was generated using this tool."
+      ]
+    },
+    {
+      "name": "Code Bot",
+      "description": "CLI tool that explores LLMs through personalized, plugin-driven code automation. Project was created pre Claude Code, Cursor, etc.",
+      "technologies": ["Go"],
+      "github": "https://github.com/randallmlough/code-bot",
+      "items": [
+        "Built AI-powered coding assistant using OpenAI GPT API and Go, enabling automated code generation, file creation, and project structure understanding through prompt engineering.",
+        "Developed CLI tool with interactive chat interface supporting file input/output operations, custom prompt injection, and automated conversation priming for improved AI response accuracy."
+      ]
+    },
+    {
+      "name": "PGX Scan",
+      "description": "A once popular plugin for the PGX library that provides a simple and efficient way to map SQL query results to Go structs.",
+      "technologies": ["Go", "PostgreSQL", "Docker"],
+      "github": "https://github.com/randallmlough/pgxscan",
+      "items": [
+        "Developed and maintained a popular Go library extending PostgreSQL PGX driver capabilities, enabling seamless scanning from database queries to Go structs and complex data types.",
+        "Implemented advanced struct mapping features including JSON column support, nested struct scanning, and flexible join table handling with configurable column notation strategies."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "University of Arizona",
+      "college": "Eller College of Management",
+      "degree": "Bachelor of Science in Business Administration",
+      "fieldOfStudy": "Marketing",
+      "startDate": "2009",
+      "endDate": "2012",
+      "location": "Tucson, AZ",
+      "gpa": ""
+    }
+  ],
+  "skills": [
+    {
+      "name": "JavaScript",
+      "level": "Advanced",
+      "years": "6 years",
+      "keywords": ["ES6+", "OOP", "Functional Programming"],
+      "category": "Programming Languages"
+    },
+    {
+      "name": "TypeScript",
+      "level": "Advanced",
+      "years": "4 years",
+      "keywords": ["ES6+", "OOP", "Functional Programming"],
+      "category": "Programming Languages"
+    },
+    {
+      "name": "Go",
+      "level": "Advanced",
+      "years": "5 years",
+      "category": "Programming Languages",
+      "keywords": ["Concurrency", "Microservices", "RESTful APIs"]
+    },
+    {
+      "name": "Python",
+      "level": "Advanced",
+      "years": "1.5 years",
+      "category": "Programming Languages",
+      "keywords": ["Django", "Flask", "Data Analysis"]
+    },
+    {
+      "name": "SQL",
+      "level": "Advanced",
+      "years": "5 years",
+      "category": "Programming Languages",
+      "keywords": ["PostgreSQL", "MySQL", "SQLite"]
+    },
+    {
+      "name": "HTML and CSS",
+      "level": "Advanced",
+      "years": "5 years",
+      "category": "Programming Languages",
+      "keywords": ["Responsive Design", "Tailwind CSS"]
+    },
+    {
+      "name": "React",
+      "level": "Advanced",
+      "years": "5 years",
+      "category": "Frameworks and Libraries",
+      "keywords": ["Next.js"]
+    },
+    {
+      "name": "Next.js",
+      "level": "Advanced",
+      "years": "5 years",
+      "category": "Frameworks and Libraries",
+      "keywords": ["Next.js"]
+    },
+    {
+      "name": "Ruby on Rails",
+      "level": "Intermediate",
+      "years": "3 years",
+      "category": "Frameworks and Libraries",
+      "keywords": ["MVC", "ActiveRecord"]
+    },
+    {
+      "name": "Django",
+      "level": "Intermediate",
+      "years": "1.5 years",
+      "category": "Frameworks and Libraries"
+    },
+    {
+      "name": "HTMX",
+      "level": "Advanced",
+      "years": "1.5 years",
+      "category": "Frameworks and Libraries"
+    },
+    {
+      "name": "Playwright",
+      "level": "Advanced",
+      "years": "1.5 years",
+      "category": "Frameworks and Libraries"
+    },
+    {
+      "name": "PostgreSQL",
+      "level": "Advanced",
+      "years": "5 years",
+      "category": "Databases"
+    },
+    {
+      "name": "MySQL",
+      "level": "intermediate",
+      "years": "3 years",
+      "category": "Databases"
+    },
+    {
+      "name": "MongoDB",
+      "level": "intermediate",
+      "years": "2 years",
+      "category": "Databases"
+    },
+    {
+      "name": "Redis",
+      "level": "Advanced",
+      "years": "4 years",
+      "category": "Databases"
+    },
+    {
+      "name": "OpenSearch",
+      "level": "intermediate",
+      "years": "2 years",
+      "category": "Databases"
+    },
+    {
+      "name": "Github Actions",
+      "level": "advanced",
+      "years": "3 years",
+      "category": "CI/CD, Infra, Monitoring"
+    },
+    {
+      "name": "Docker",
+      "level": "advanced",
+      "years": "5 years",
+      "category": "CI/CD, Infra, Monitoring"
+    },
+    {
+      "name": "AWS",
+      "level": "advanced",
+      "years": "3 years",
+      "category": "CI/CD, Infra, Monitoring"
+    },
+    {
+      "name": "Rollbar",
+      "level": "advanced",
+      "years": "3 years",
+      "category": "CI/CD, Infra, Monitoring"
+    },
+    {
+      "name": "Sentry",
+      "level": "advanced",
+      "years": "4 years",
+      "category": "CI/CD, Infra, Monitoring"
+    },
+    {
+      "name": "Git",
+      "level": "advanced",
+      "years": "7+ years",
+      "category": "Tools"
+    },
+    {
+      "name": "LLM Tools (Claude Code, Gemini CLI, OpenAI Codex)",
+      "level": "advanced",
+      "years": "2 years",
+      "category": "Tools"
+    },
+    {
+      "name": "IntelliJ",
+      "level": "advanced",
+      "years": "5+ years",
+      "category": "Tools"
+    },
+    {
+      "name": "VS Code",
+      "level": "advanced",
+      "years": "5+ years",
+      "category": "Tools"
+    }
+  ]
+}
