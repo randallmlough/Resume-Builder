@@ -117,7 +117,7 @@
       "name": "Resume Builder",
       "description": "A simple resume builder that takes a JSON object and generates a modern, AST friendly resume using Go and LaTex.",
       "technologies": ["Go", "LaTex"],
-      "github": "https://github.com/randallmlough/code-bot",
+      "github": "https://github.com/randallmlough/Resume-Builder",
       "items": [
         "Designed a resume builder application using Go and LaTex, enabling myself (and others) to create professional resumes from structured JSON data.",
         "This resume you are currently viewing was generated using this tool."
