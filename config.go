@@ -8,19 +8,30 @@ import (
 )
 
 type BaseSection struct {
-	Enabled bool `yaml:"enabled"`
+	Hide bool `yaml:"hide"`
 }
 type Config struct {
 	TemplateName string `yaml:"template_name"`
 	AccentColor  string `yaml:"accent_color"`
+	MutedColor   string `yaml:"muted_color"`
+	FontSans     string `yaml:"font_sans"`
+	FontSerif    string `yaml:"font_serif"`
 
 	Contact    BaseSection `yaml:"contact"`
 	Summary    BaseSection `yaml:"summary"`
 	Skills     BaseSection `yaml:"skills"`
-	Experience BaseSection `yaml:"experience"`
+	Experience Experience  `yaml:"experience"`
 	Education  BaseSection `yaml:"education"`
 	Projects   BaseSection `yaml:"projects"`
 	Awards     BaseSection `yaml:"awards"`
+}
+
+type Experience struct {
+	BaseSection
+	HideOverview     bool `yaml:"hide_overview"`
+	HideLocation     bool `yaml:"hide_location"`
+	HideDate         bool `yaml:"hide_date"`
+	HideTechnologies bool `yaml:"hide_technologies"`
 }
 
 func LoadConfig() (*Config, error) {

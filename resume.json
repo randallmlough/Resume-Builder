@@ -13,6 +13,10 @@
     {
       "company": "Appraisal Desk",
       "location": "Remote",
+      "startDate": "October 2023",
+      "endDate": "Present",
+      "overview": "something about the company",
+      "technologies": ["NextJS", "TypeScript", "GraphQL", "PostgreSQL", "Redis", "Prisma"],
       "positions": [
         {
           "title": "Freelance Software Engineer",

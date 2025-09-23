@@ -106,12 +106,14 @@ func (s *Skill) UnmarshalJSON(data []byte) error {
 }
 
 type Job struct {
-	Company          string     `json:"company"`
-	Location         string     `json:"location,omitempty"`
-	Positions        []Position `json:"positions,omitempty"`
-	StartDate        string     `json:"startDate,omitempty"`
-	EndDate          string     `json:"endDate,omitempty"`
-	Responsibilities []string   `json:"responsibilities,omitempty"`
+	Company      string     `json:"company"`
+	Location     string     `json:"location,omitempty"`
+	Website      string     `json:"website,omitempty"`
+	Overview     string     `json:"overview,omitempty"`
+	Technologies []string   `json:"technologies,omitempty"`
+	StartDate    string     `json:"startDate,omitempty"`
+	EndDate      string     `json:"endDate,omitempty"`
+	Positions    []Position `json:"positions,omitempty"`
 }
 
 type Position struct {

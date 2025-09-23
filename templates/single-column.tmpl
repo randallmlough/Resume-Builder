@@ -16,6 +16,7 @@
 
 % Define custom colors
 \definecolor{accentColor}{HTML}{ {{- .Config.AccentColor}}}
+\definecolor{mutedColor}{HTML}{ {{- .Config.MutedColor}}}
 
 \usepackage{verbatim}
 \usepackage{enumitem}
@@ -24,6 +25,7 @@
 \usepackage[english]{babel}
 \usepackage{tabularx}
 \usepackage{fontspec}
+\usepackage{xparse}
 
 %----------FONT OPTIONS----------
 \setmainfont{merriweather-sans} % Clean sans-serif for body text
@@ -85,6 +87,18 @@
     \end{tabular*}\vspace{-5pt}
 }
 
+% Arguments: location (optional), date range (optional), overview (optional), technologies (optional), company name (required)
+\NewDocumentCommand{\resumeExperienceHeading}{o o o o m}{%
+    \vspace{-1pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{@{}l@{\extracolsep{\fill}}r@{}}
+        % Right column: add a | only if #1 was PROVIDED
+        \textcolor{accentColor}{\textbf{\large#5}}\IfNoValueF{#1}{\textcolor{mutedColor}{~$|$~#1}} & \IfNoValueF{#2}{~#2}\\
+        % Subline: add parentheses only if #2 was PROVIDED
+        \IfNoValueF{#3}{\textit{\small #3}\\}
+        \IfNoValueF{#4}{\textit{\small #4}\\}
+    \end{tabular*}\vspace{1pt}%
+}
+
 \newcommand{\resumeSubheadingLocation}[3]{
     \vspace{-1pt}\item
     \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
@@ -95,7 +109,7 @@
 
 \newcommand{\resumeSubheading}[3]{
     \vspace{-1pt}\item
-    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+    \begin{tabular*}{0.97\textwidth}[t]{@{}l@{\extracolsep{\fill}}r@{}}
         \textcolor{accentColor}{\textbf{\large#1}} \\
         \textit{\small#2} & \textit{\small #3} \\
     \end{tabular*}\vspace{-5pt}
@@ -137,33 +151,34 @@
 \href{https://www.{{.Contact.GitHub}}}{ {{- .Contact.GitHub}}}
 \end{center}
 
+{{- if not .Config.Summary.Hide}}
 %-----------OVERVIEW-----------------
 \section{Overview}
 \small {{latexEscape .Summary}}
+{{ end -}}
 
 %-----------EXPERIENCE-----------------
 \section{Experience}
 \resumeSubHeadingListStart
 {{ range $experience :=.Experience -}}
+    \resumeExperienceHeading
+        [{{ if and (not $.Config.Experience.HideLocation) (ne $experience.Location "") -}}{{- $experience.Location}}{{ end -}}]
+        [{{ if and (not $.Config.Experience.HideDate) (ne $experience.StartDate "") -}}{{- $experience.StartDate}} — {{- $experience.EndDate}}{{ end -}}]
+        {{ if and (not $.Config.Experience.HideOverview) (ne $experience.Overview "") -}}
+            [{{- latexEscape $experience.Overview}}]
+        {{ end -}}
+        {{ if and (not $.Config.Experience.HideTechnologies) (ne (len $experience.Technologies) 0) -}}
+            [{{- join $experience.Technologies ", "}}]
+        {{ end -}}
+        { {{- $experience.Company}}}
     {{ range $index, $position := $experience.Positions -}}
-        {{ if eq $index 0 -}}
-            \resumeSubheading
-                { {{- $experience.Company}}}%{ {{- $experience.Location}}}
-                { {{- $position.Title}}{{if ne $position.Type ""}} ({{$position.Type}}){{end}}}{ {{- $position.StartDate}} — {{- $position.EndDate}}}
-            \resumeItemListStart
-            {{- range $position.Responsibilities }}
-                \resumeItem{ {{- latexEscape .}} }
-            {{- end }}
-            \resumeItemListEnd
-        {{ else -}}
-            \resumeSubSubheading
+        \resumeSubSubheading
             { {{- $position.Title}}}{ {{- $position.StartDate}} — {{- $position.EndDate}}}
             \resumeItemListStart
             {{- range $position.Responsibilities }}
                 \resumeItem{ {{- latexEscape .}} }
             {{- end }}
             \resumeItemListEnd
-        {{ end -}}
     {{ end -}}
 {{ end -}}
 \resumeSubHeadingListEnd

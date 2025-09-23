@@ -13,7 +13,7 @@ gen:  ## Generate Tex file *common*
 	@go run .
 
 .PHONY: create_pdf
-create_pdf: clean build_image ## Create PDF
+create_pdf: clean ## Create PDF
 	@echo 'Creating PDF resume file'
 	@docker run --rm -i -v "$(shell pwd)":/data resume/latex lualatex -output-directory=dist resume.tex
 

@@ -54,9 +54,32 @@
             "type": "string",
             "description": "Company name"
           },
+          "website": {
+            "type": "string",
+            "description": "Company website URL"
+          },
           "location": {
             "type": "string",
             "description": "Company location"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Date joined (e.g., 'June 2021')"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Date Finished (e.g., 'June 2023' or 'Present')"
+          },
+          "overview": {
+            "type": "string",
+            "description": "Brief overview of the company or role"
+          },
+          "technologies": {
+            "type": "array",
+            "description": "Technologies used at the company",
+            "items": {
+              "type": "string"
+            }
           },
           "positions": {
             "type": "array",
