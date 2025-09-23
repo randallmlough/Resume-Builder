@@ -6,7 +6,7 @@ font_serif: "merriweather"
 summary:
   hide: true
 experience:
-  hide_overview: true
+  hide_overview: false
   hide_location: false
-  hide_date: true
+  hide_date: false
   hide_technologies: false
