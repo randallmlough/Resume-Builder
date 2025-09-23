@@ -25,7 +25,7 @@
 \usepackage[english]{babel}
 \usepackage{tabularx}
 \usepackage{fontspec}
-\usepackage{xparse}
+\usepackage{xparse, l3keys2e}
 
 %----------FONT OPTIONS----------
 \setmainfont{merriweather-sans} % Clean sans-serif for body text
@@ -87,27 +87,57 @@
     \end{tabular*}\vspace{-5pt}
 }
 
-% Arguments: location (optional), date range (optional), overview (optional), technologies (optional), company name (required)
-\NewDocumentCommand{\resumeExperienceHeading}{o o o o m}{%
-    \vspace{-1pt}\item
-    \begin{tabular*}{0.97\textwidth}[t]{@{}l@{\extracolsep{\fill}}r@{}}%
-        % Left col: Company (required), optionally append " | location"
-        \textcolor{accentColor}{\textbf{\large #5}}%
-        \IfNoValueF{#1}{\textcolor{mutedColor}{\enspace\textbar\enspace #1}}%
-        &
-        % Right col: Date range (only if provided)
-        \IfNoValueF{#2}{\textcolor{mutedColor}{#2}}%
-        \\[-2pt]
-        % Overview row (spans both columns) — only if provided
-        \IfNoValueF{#3}{%
-            \multicolumn{2}{@{}l@{}}{\textit{\small #3}}\\[-2pt]%
-        }%
-        % Technologies row (spans both columns) — only if provided
-        \IfNoValueF{#4}{%
-            \multicolumn{2}{@{}l@{}}{\textit{\small #4}}\\[-2pt]%
-        }%
-    \end{tabular*}\vspace{1pt}%
-}
+\ExplSyntaxOn
+% Define storage variables
+\tl_new:N \l_resume_company_tl
+\tl_new:N \l_resume_location_tl
+\tl_new:N \l_resume_dates_tl
+\tl_new:N \l_resume_overview_tl
+
+% Define the keys
+\keys_define:nn { resume / experience }
+    {
+        company     .tl_set:N = \l_resume_company_tl,
+        location    .tl_set:N = \l_resume_location_tl,
+        dates       .tl_set:N = \l_resume_dates_tl,
+        overview    .tl_set:N = \l_resume_overview_tl,
+    }
+
+% The actual macro
+\NewDocumentCommand{\resumeExperienceHeading}{ O{} }
+    {
+        \group_begin:
+        % Clear variables each time
+        \tl_clear:N \l_resume_company_tl
+        \tl_clear:N \l_resume_location_tl
+        \tl_clear:N \l_resume_dates_tl
+        \tl_clear:N \l_resume_overview_tl
+
+        % Parse key=values
+        \keys_set:nn { resume / experience } { #1 }
+
+        % Render
+        \vspace{-1pt}\item
+        \begin{tabular*}{0.97\textwidth}[t]{@{}l@{\extracolsep{\fill}}r@{}}%
+            % Company + optional location
+            \textcolor{accentColor}{\textbf{\large \tl_use:N \l_resume_company_tl}}%
+            \tl_if_blank:VTF \l_resume_location_tl
+                { } % nothing if empty
+                { \textcolor{mutedColor}{\footnotesize\enspace\textbar\enspace \tl_use:N \l_resume_location_tl} }%
+            &
+            % Optional dates
+            \tl_if_blank:VTF \l_resume_dates_tl
+                { }
+                { \textcolor{mutedColor}{\footnotesize \tl_use:N \l_resume_dates_tl} }%
+            \\[-1pt]
+            % Overview (spans both columns)
+            \tl_if_blank:VTF \l_resume_overview_tl
+                { }
+                { \multicolumn{2}{@{}l@{}}{\textcolor{mutedColor}{\footnotesize \tl_use:N \l_resume_overview_tl}}\\[3pt] }
+        \end{tabular*}\vspace{1pt}%
+        \group_end:
+    }
+\ExplSyntaxOff
 
 \newcommand{\resumeSubheadingLocation}[3]{
     \vspace{-1pt}\item
@@ -127,7 +157,7 @@
 
 \newcommand{\resumeSubSubheading}[2]{
     \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
-        \textit{\small#1} & \textit{\small #2} \\
+        \textbf{\textit{\small#1}} & \textit{\small #2} \\
     \end{tabular*}\vspace{-5pt}
 }
 
@@ -171,16 +201,18 @@
 \section{Experience}
 \resumeSubHeadingListStart
 {{ range $experience :=.Experience -}}
-    \resumeExperienceHeading
-        [{{ if and (not $.Config.Experience.HideLocation) (ne $experience.Location "") -}}{{- $experience.Location}}{{ end -}}]
-        [{{ if and (not $.Config.Experience.HideDate) (ne $experience.StartDate "") -}}{{- $experience.StartDate}} — {{- $experience.EndDate}}{{ end -}}]
-        {{ if and (not $.Config.Experience.HideOverview) (ne $experience.Overview "") -}}
-            [{{- latexEscape $experience.Overview}}]
-        {{ end -}}
-        {{ if and (not $.Config.Experience.HideTechnologies) (ne (len $experience.Technologies) 0) -}}
-            [{{- join $experience.Technologies ", "}}]
-        {{ end -}}
-        { {{- $experience.Company}}}
+    \resumeExperienceHeading[
+    company={ {{- $experience.Company}}},
+    {{ if and (not $.Config.Experience.HideLocation) (ne $experience.Location "") -}}
+        location={ {{- $experience.Location}}},
+    {{ end -}}
+    {{ if and (not $.Config.Experience.HideDate) (ne $experience.StartDate "") -}}
+        dates={ {{- $experience.StartDate}} — {{- $experience.EndDate}}},
+    {{ end -}}
+    {{ if and (not $.Config.Experience.HideOverview) (ne $experience.Overview "") -}}
+        overview={ {{- latexEscape $experience.Overview}}},
+    {{ end -}}
+    ]
     {{ range $index, $position := $experience.Positions -}}
         \resumeSubSubheading
             { {{- $position.Title}}}{ {{- $position.StartDate}} — {{- $position.EndDate}}}
@@ -189,6 +221,12 @@
                 \resumeItem{ {{- latexEscape .}} }
             {{- end }}
             \resumeItemListEnd
+    {{ end -}}
+    {{ if and (not $.Config.Experience.HideTechnologies) (ne (len $experience.Technologies) 0) -}}
+    \begin{tabular*}{0.97\textwidth}{l@{}r}
+        \vspace{12pt}
+        \textcolor{mutedColor}{\textit{\footnotesize{Technologies: }}} & \textcolor{mutedColor}{\textit{\footnotesize{ {{- join $experience.Technologies ", "}}}}}\\
+    \end{tabular*}\vspace{-5pt}
     {{ end -}}
 {{ end -}}
 \resumeSubHeadingListEnd

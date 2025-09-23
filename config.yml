@@ -4,9 +4,9 @@ muted_color: 5a5a5a
 font_sans: "merriweather-sans"
 font_serif: "merriweather"
 summary:
-  hide: true
+  hide: false
 experience:
   hide_overview: false
   hide_location: false
-  hide_date: false
+  hide_date: true
   hide_technologies: false
