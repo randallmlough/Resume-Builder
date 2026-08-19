@@ -339,28 +339,39 @@
       "category": "CI/CD, Infra, Monitoring"
     },
     {
-      "name": "Git",
-      "level": "advanced",
-      "years": "7+ years",
-      "category": "Tools"
+      "name": "AI-Assisted Development",
+      "level": "Advanced",
+      "years": "4 years",
+      "category": "AI and Developer Productivity",
+      "keywords": ["OpenAI Codex", "Claude Code", "CoPilot","PI", "OpenCode"]
     },
     {
-      "name": "LLM Tools (Claude Code, Gemini CLI, OpenAI Codex)",
-      "level": "advanced",
+      "name": "Multi-Agent Development Workflows",
+      "level": "Advanced",
       "years": "2 years",
-      "category": "Tools"
+      "category": "AI and Developer Productivity",
+      "keywords": ["Planner/Implementer/Reviewer Patterns", "Task Decomposition", "Agent Handoffs", "Review Loops"]
     },
     {
-      "name": "IntelliJ",
-      "level": "advanced",
-      "years": "5+ years",
-      "category": "Tools"
+      "name": "AI Workflow Orchestration",
+      "level": "Advanced",
+      "years": "2 years",
+      "category": "AI and Developer Productivity",
+      "keywords": ["Human-in-the-Loop Flows", "GitHub Automation", "n8n", "Codex CLI"]
     },
     {
-      "name": "VS Code",
-      "level": "advanced",
-      "years": "5+ years",
-      "category": "Tools"
+      "name": "Prompt and Task Design",
+      "level": "Advanced",
+      "years": "4 years",
+      "category": "AI and Developer Productivity",
+      "keywords": ["PRDs", "Acceptance Criteria", "Context Engineering", "Evaluation"]
+    },
+    {
+      "name": "AI Tool Integrations",
+      "level": "Advanced",
+      "years": "2 years",
+      "category": "AI and Developer Productivity",
+      "keywords": ["Figma Workflows", "Marketing Workflows", "Analytics Workflows", "Cross-Tool Agents"]
     }
   ]
 }
