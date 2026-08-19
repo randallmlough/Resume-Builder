@@ -8,14 +8,14 @@
     "github": "github.com/randallmlough",
     "website": "https://www.randyLough.com"
   },
-  "summary": "Senior full-stack engineer with 8+ years experience delivering high-impact features, leading architecture decisions, and scaling fintech and SaaS systems. Known for driving AI product initiatives, mentoring teams, and shipping resilient, production-ready code in modern codebases.",
+  "summary": "AI-fluent senior full-stack product engineer who owns ambiguous work across web, mobile, backend, and internal tools. Strong in TypeScript, React, React Native, Django/Python, Go, and product analytics, with recent experience rebuilding conversion-critical funnels and helping teams adopt practical AI-assisted development workflows. Known for clear planning, reliable execution, and tying engineering work back to user and business outcomes.",
   "experience": [
     {
       "company": "Duckbill",
       "location": "Remote",
       "startDate": "October 2025",
       "endDate": "July 2026",
-      "overview": "A consumer product that helped members hand off everyday tasks through a mix of software, internal tools, and human support.",
+      "overview": "A consumer AI product where members could hand off a wide range of everyday tasks to software agents, with human operators involved when judgment or follow-through was needed.",
       "technologies": ["TypeScript", "React", "React Native", "Django", "Playwright"],
       "positions": [
         {
