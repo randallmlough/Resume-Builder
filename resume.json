@@ -145,7 +145,7 @@
       "items": [
         "Built the app as a full-stack TypeScript monorepo with an Expo/React Native iOS client, a Hono API, a TanStack web app, shared Zod contracts, and Drizzle/Postgres storage.",
         "Used PowerSync and OP-SQLite for offline list and item updates, reactive queries, and background sync. Added tombstones and last-writer-wins conflict handling.",
-        "Built household sharing with Clerk authentication, membership-scoped replication, server-side row authorization, and role-based permissions. Members can join through invitations or reusable household codes.",
+        "Built household sharing with Clerk authentication, membership-scoped replication, server-side row authorization, and role-based permissions. Members can join through invitations or reusable household codes."
       ]
     },
     {
@@ -154,8 +154,8 @@
       "technologies": ["Go", "LaTeX"],
       "github": "https://github.com/randallmlough/Resume-Builder",
       "items": [
-        "Built the tool to generate resumes from structured JSON for my own use and for others.",
-        "This resume was generated with it."
+        "Built a Go pipeline that loads version-controlled JSON into typed models, renders a Go template to LaTeX, and compiles the PDF with LuaTeX inside Docker.",
+        "Wrote a Goldmark AST renderer that converts Markdown cover letters to LaTeX, including headings, emphasis, code, links, and nested lists."
       ]
     },
     {
