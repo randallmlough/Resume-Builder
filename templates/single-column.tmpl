@@ -27,6 +27,7 @@
 \usepackage{tabularx}
 \usepackage{fontspec}
 \usepackage{xparse, l3keys2e}
+\usepackage{needspace}
 
 %----------FONT OPTIONS----------
 \setmainfont{merriweather-sans} % Clean sans-serif for body text
@@ -75,6 +76,9 @@
 
 %-------------------------
 % Custom commands
+\newcommand{\resumeExperienceMinimumSpace}{10\baselineskip}
+\newcommand{\resumeRoleMinimumSpace}{5\baselineskip}
+
 \newcommand{\resumeItem}[1]{
     \item\small{
         {#1 \vspace{-2pt}}
@@ -107,6 +111,7 @@
 % The actual macro
 \NewDocumentCommand{\resumeExperienceHeading}{ O{} }
     {
+        \Needspace{\resumeExperienceMinimumSpace}%
         \group_begin:
         % Clear variables each time
         \tl_clear:N \l_resume_company_tl
@@ -157,6 +162,7 @@
 }
 
 \newcommand{\resumeSubSubheading}[2]{
+    \Needspace{\resumeRoleMinimumSpace}%
     \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
         \textbf{\textit{\small#1}} & \textit{\small #2} \\
     \end{tabular*}\vspace{-5pt}
