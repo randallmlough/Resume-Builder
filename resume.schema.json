@@ -135,6 +135,11 @@
             "type": "string",
             "description": "Project name"
           },
+          "hide": {
+            "type": "boolean",
+            "default": false,
+            "description": "Hide this project from generated resumes while preserving it in the source data"
+          },
           "description": {
             "type": "string",
             "description": "Project description"
@@ -176,6 +181,11 @@
           "institution": {
             "type": "string",
             "description": "Educational institution name"
+          },
+          "hide": {
+            "type": "boolean",
+            "default": false,
+            "description": "Hide this education entry from generated resumes while preserving it in the source data"
           },
           "college": {
             "type": "string",

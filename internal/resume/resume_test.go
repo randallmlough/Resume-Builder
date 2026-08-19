@@ -40,6 +40,46 @@ func TestVisibleExperienceReturnsEmptySliceWhenAllJobsAreHidden(t *testing.T) {
 	}
 }
 
+func TestVisibleProjectsFiltersHiddenProjects(t *testing.T) {
+	projects := []Project{
+		{Name: "Visible One"},
+		{Name: "Hidden", Hide: true},
+		{Name: "Visible Two"},
+	}
+
+	got := visibleProjects(projects)
+
+	if len(got) != 2 {
+		t.Fatalf("expected 2 visible projects, got %d", len(got))
+	}
+	if got[0].Name != "Visible One" {
+		t.Errorf("expected first visible project to be %q, got %q", "Visible One", got[0].Name)
+	}
+	if got[1].Name != "Visible Two" {
+		t.Errorf("expected second visible project to be %q, got %q", "Visible Two", got[1].Name)
+	}
+}
+
+func TestVisibleEducationFiltersHiddenEducation(t *testing.T) {
+	education := []Education{
+		{Institution: "Visible One"},
+		{Institution: "Hidden", Hide: true},
+		{Institution: "Visible Two"},
+	}
+
+	got := visibleEducation(education)
+
+	if len(got) != 2 {
+		t.Fatalf("expected 2 visible education entries, got %d", len(got))
+	}
+	if got[0].Institution != "Visible One" {
+		t.Errorf("expected first visible education entry to be %q, got %q", "Visible One", got[0].Institution)
+	}
+	if got[1].Institution != "Visible Two" {
+		t.Errorf("expected second visible education entry to be %q, got %q", "Visible Two", got[1].Institution)
+	}
+}
+
 func TestSingleColumnTemplateSkipsHiddenExperience(t *testing.T) {
 	resume := &PersonalDetail{
 		Name: "Test Person",
@@ -94,6 +134,182 @@ func TestSingleColumnTemplateSkipsHiddenExperience(t *testing.T) {
 	}
 	if strings.Contains(got, "Hidden Company") {
 		t.Errorf("expected rendered resume to exclude hidden company")
+	}
+}
+
+func TestSingleColumnTemplateSkipsHiddenProjects(t *testing.T) {
+	resume := &PersonalDetail{
+		Name: "Test Person",
+		Contact: Contact{
+			Email:    "test@example.com",
+			Phone:    "555-555-5555",
+			LinkedIn: "linkedin.com/in/test",
+			GitHub:   "github.com/test",
+		},
+		Summary: "Summary",
+		Projects: []Project{
+			{
+				Name:       "Visible Project",
+				Github:     "https://github.com/test/visible",
+				Technology: []string{"Go"},
+				Items:      []string{"Visible work"},
+			},
+			{
+				Name:       "Hidden Project",
+				Hide:       true,
+				Github:     "https://github.com/test/hidden",
+				Technology: []string{"Go"},
+				Items:      []string{"Hidden work"},
+			},
+		},
+	}
+	cfg := &config.Config{
+		AccentColor: "1f79c7",
+		MutedColor:  "5a5a5a",
+	}
+
+	got, err := GenerateLaTeX("single-column", funcMap, Data{
+		Resume: resume,
+		Config: cfg,
+	})
+	if err != nil {
+		t.Fatalf("expected template to render, got error: %v", err)
+	}
+
+	if !strings.Contains(got, "Visible Project") {
+		t.Errorf("expected rendered resume to include visible project")
+	}
+	if strings.Contains(got, "Hidden Project") {
+		t.Errorf("expected rendered resume to exclude hidden project")
+	}
+}
+
+func TestSingleColumnTemplateOmitsProjectsSectionWhenAllProjectsAreHidden(t *testing.T) {
+	resume := &PersonalDetail{
+		Name: "Test Person",
+		Contact: Contact{
+			Email:    "test@example.com",
+			Phone:    "555-555-5555",
+			LinkedIn: "linkedin.com/in/test",
+			GitHub:   "github.com/test",
+		},
+		Summary: "Summary",
+		Projects: []Project{
+			{
+				Name:       "Hidden Project",
+				Hide:       true,
+				Github:     "https://github.com/test/hidden",
+				Technology: []string{"Go"},
+				Items:      []string{"Hidden work"},
+			},
+		},
+	}
+	cfg := &config.Config{
+		AccentColor: "1f79c7",
+		MutedColor:  "5a5a5a",
+	}
+
+	got, err := GenerateLaTeX("single-column", funcMap, Data{
+		Resume: resume,
+		Config: cfg,
+	})
+	if err != nil {
+		t.Fatalf("expected template to render, got error: %v", err)
+	}
+
+	if strings.Contains(got, `\section{Projects}`) {
+		t.Errorf("expected rendered resume to omit projects section when all projects are hidden")
+	}
+	if strings.Contains(got, "Hidden Project") {
+		t.Errorf("expected rendered resume to exclude hidden project")
+	}
+}
+
+func TestSingleColumnTemplateSkipsHiddenEducation(t *testing.T) {
+	resume := &PersonalDetail{
+		Name: "Test Person",
+		Contact: Contact{
+			Email:    "test@example.com",
+			Phone:    "555-555-5555",
+			LinkedIn: "linkedin.com/in/test",
+			GitHub:   "github.com/test",
+		},
+		Summary: "Summary",
+		Education: []Education{
+			{
+				Institution: "Visible University",
+				Degree:      "Visible Degree",
+				StartDate:   "2020",
+				EndDate:     "2024",
+			},
+			{
+				Institution: "Hidden University",
+				Hide:        true,
+				Degree:      "Hidden Degree",
+				StartDate:   "2016",
+				EndDate:     "2020",
+			},
+		},
+	}
+	cfg := &config.Config{
+		AccentColor: "1f79c7",
+		MutedColor:  "5a5a5a",
+	}
+
+	got, err := GenerateLaTeX("single-column", funcMap, Data{
+		Resume: resume,
+		Config: cfg,
+	})
+	if err != nil {
+		t.Fatalf("expected template to render, got error: %v", err)
+	}
+
+	if !strings.Contains(got, "Visible University") {
+		t.Errorf("expected rendered resume to include visible education")
+	}
+	if strings.Contains(got, "Hidden University") {
+		t.Errorf("expected rendered resume to exclude hidden education")
+	}
+}
+
+func TestSingleColumnTemplateOmitsEducationSectionWhenAllEducationIsHidden(t *testing.T) {
+	resume := &PersonalDetail{
+		Name: "Test Person",
+		Contact: Contact{
+			Email:    "test@example.com",
+			Phone:    "555-555-5555",
+			LinkedIn: "linkedin.com/in/test",
+			GitHub:   "github.com/test",
+		},
+		Summary: "Summary",
+		Education: []Education{
+			{
+				Institution: "Hidden University",
+				Hide:        true,
+				Degree:      "Hidden Degree",
+				StartDate:   "2016",
+				EndDate:     "2020",
+			},
+		},
+	}
+	cfg := &config.Config{
+		AccentColor: "1f79c7",
+		MutedColor:  "5a5a5a",
+	}
+
+	got, err := GenerateLaTeX("single-column", funcMap, Data{
+		Resume: resume,
+		Config: cfg,
+	})
+	if err != nil {
+		t.Fatalf("expected template to render, got error: %v", err)
+	}
+
+	if strings.Contains(got, `\section{Education}`) {
+		t.Errorf("expected rendered resume to omit education section when all education is hidden")
+	}
+	if strings.Contains(got, "Hidden University") {
+		t.Errorf("expected rendered resume to exclude hidden education")
 	}
 }
 

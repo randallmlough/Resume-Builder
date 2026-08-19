@@ -235,10 +235,12 @@
 \resumeSubHeadingListEnd
 {{ end -}}
 
+{{- $visibleProjects := visibleProjects $details.Projects -}}
+{{- if and (not .Config.Projects.Hide) (ne (len $visibleProjects) 0) }}
 %-----------PROJECTS-----------
 \section{Projects}
 \resumeSubHeadingListStart
-{{ range $details.Projects -}}
+{{ range $visibleProjects -}}
     \resumeProjectHeading
     {\textbf{ {{- .Name}}} $|$ \emph{ {{- join .Technology ", "}}}}{ \href{ {{- .Github}}}{\underline{Github}}}
     %\small{ { {{- .Description}} \vspace{2pt}}}
@@ -249,6 +251,7 @@
     \resumeItemListEnd
 {{ end -}}
 \resumeSubHeadingListEnd
+{{ end -}}
 
 %--------SKILLS------------
 \section{Technical Skills}
@@ -260,15 +263,18 @@
 }}
 \end{itemize}
 
+{{- $visibleEducation := visibleEducation $details.Education -}}
+{{- if and (not .Config.Education.Hide) (ne (len $visibleEducation) 0) }}
 %-----------EDUCATION-----------------
 \section{Education}
 \resumeSubHeadingListStart
-{{- range $details.Education}}
+{{- range $visibleEducation}}
     \resumeSubheadingLocation
     { {{- .Institution}}{{if ne .College ""}}, {{.College}}{{end}}}{ {{- .StartDate}} — {{.EndDate}}}
     { {{- .Degree}}{{if ne .GPA ""}}; GPA: {{.GPA}}{{end}}}
 {{ end -}}
 \resumeSubHeadingListEnd
+{{ end -}}
 
 %-------------------------------------------
 \end{document}

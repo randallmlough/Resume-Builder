@@ -94,6 +94,7 @@ type Position struct {
 
 type Education struct {
 	Institution string `json:"institution"`
+	Hide        bool   `json:"hide,omitempty"`
 	College     string `json:"college,omitempty"`
 	Degree      string `json:"degree"`
 	StartDate   string `json:"startDate"`
@@ -104,6 +105,7 @@ type Education struct {
 
 type Project struct {
 	Name        string   `json:"name"`
+	Hide        bool     `json:"hide,omitempty"`
 	Description string   `json:"description"`
 	Link        string   `json:"link,omitempty"`
 	Github      string   `json:"github,omitempty"`
@@ -174,7 +176,9 @@ func GenerateResume(r *PersonalDetail, cfg *config.Config) error {
 
 var funcMap = template.FuncMap{
 	"orderedSkills":     orderedSkills,
+	"visibleEducation":  visibleEducation,
 	"visibleExperience": visibleExperience,
+	"visibleProjects":   visibleProjects,
 	"join":              strings.Join,
 	"latexEscape":       latexEscape,
 }
@@ -213,6 +217,28 @@ func visibleExperience(jobs []Job) []Job {
 			continue
 		}
 		data = append(data, job)
+	}
+	return data
+}
+
+func visibleProjects(projects []Project) []Project {
+	data := []Project{}
+	for _, project := range projects {
+		if project.Hide {
+			continue
+		}
+		data = append(data, project)
+	}
+	return data
+}
+
+func visibleEducation(education []Education) []Education {
+	data := []Education{}
+	for _, item := range education {
+		if item.Hide {
+			continue
+		}
+		data = append(data, item)
 	}
 	return data
 }

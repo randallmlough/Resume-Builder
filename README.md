@@ -89,7 +89,7 @@ The resume is defined in `resume.json` with the following sections:
 }
 ```
 
-Set `"hide": true` on an experience item to exclude that job from generated resumes while keeping the data in `resume.json` for later versions.
+Set `"hide": true` on an experience, project, or education item to exclude that entry from generated resumes while keeping the data in `resume.json` for later versions.
 
 ## Customization
 

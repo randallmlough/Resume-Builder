@@ -164,7 +164,8 @@
       "startDate": "2019",
       "endDate": "2020",
       "location": "",
-      "gpa": ""
+      "gpa": "",
+      "hide": true
     },
     {
       "institution": "University of Arizona",
