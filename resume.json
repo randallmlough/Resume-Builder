@@ -28,7 +28,8 @@
             "Instrumented the signup funnel so the team could find drop-off points and verify changes in conversion.",
             "Took loosely defined product work from open questions to implementation, testing, and release.",
             "Updated the member chat interface for conversations with Duckbill's AI agent and added support for task-specific widgets.",
-            "Introduced AI-assisted coding workflows and team practices to speed up frontend work."
+            "Introduced AI-assisted coding workflows and team practices to speed up frontend work.",
+            "Built and rolled out a codebase documentation site with its own web server, covering triage, on-call, system behavior, guides, and engineering practices. Created automated AI workflows that kept the documentation current as the codebase changed."
           ]
         }
       ]
