@@ -54,6 +54,11 @@
             "type": "string",
             "description": "Company name"
           },
+          "hide": {
+            "type": "boolean",
+            "default": false,
+            "description": "Hide this job experience from generated resumes while preserving it in the source data"
+          },
           "website": {
             "type": "string",
             "description": "Company website URL"

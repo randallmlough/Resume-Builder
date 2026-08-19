@@ -118,6 +118,7 @@
       "company": "RetailOps",
       "location": "San Diego, CA",
       "overview": "A cloud-based back-office platform that automates order, inventory, and warehouse workflows.",
+      "hide": true,
       "positions": [
         {
           "title": "Marketing Manager and Web Developer",

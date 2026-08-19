@@ -74,6 +74,7 @@ func (s *Skill) UnmarshalJSON(data []byte) error {
 
 type Job struct {
 	Company      string     `json:"company"`
+	Hide         bool       `json:"hide,omitempty"`
 	Location     string     `json:"location,omitempty"`
 	Website      string     `json:"website,omitempty"`
 	Overview     string     `json:"overview,omitempty"`
@@ -172,9 +173,10 @@ func GenerateResume(r *PersonalDetail, cfg *config.Config) error {
 }
 
 var funcMap = template.FuncMap{
-	"orderedSkills": orderedSkills,
-	"join":          strings.Join,
-	"latexEscape":   latexEscape,
+	"orderedSkills":     orderedSkills,
+	"visibleExperience": visibleExperience,
+	"join":              strings.Join,
+	"latexEscape":       latexEscape,
 }
 
 type Category struct {
@@ -200,6 +202,17 @@ func orderedSkills(skills []Skill) []Category {
 				Values: []string{skill.Name},
 			})
 		}
+	}
+	return data
+}
+
+func visibleExperience(jobs []Job) []Job {
+	data := []Job{}
+	for _, job := range jobs {
+		if job.Hide {
+			continue
+		}
+		data = append(data, job)
 	}
 	return data
 }

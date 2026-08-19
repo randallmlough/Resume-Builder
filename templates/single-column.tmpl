@@ -198,10 +198,12 @@
 \small {{latexEscape $details.Summary}}
 {{ end -}}
 
+{{- $visibleExperience := visibleExperience $details.Experience -}}
+{{- if and (not .Config.Experience.Hide) (ne (len $visibleExperience) 0) }}
 %-----------EXPERIENCE-----------------
 \section{Experience}
 \resumeSubHeadingListStart
-{{ range $experience :=$details.Experience -}}
+{{ range $experience := $visibleExperience -}}
     \resumeExperienceHeading[
     company={ {{- $experience.Company}}},
     {{ if and (not $.Config.Experience.HideLocation) (ne $experience.Location "") -}}
@@ -231,6 +233,7 @@
     {{ end -}}
 {{ end -}}
 \resumeSubHeadingListEnd
+{{ end -}}
 
 %-----------PROJECTS-----------
 \section{Projects}

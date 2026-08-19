@@ -63,6 +63,7 @@ The resume is defined in `resume.json` with the following sections:
   "experience": [
     {
       "company": "Company Name",
+      "hide": false,
       "location": "City, State",
       "positions": [
         {
@@ -87,6 +88,8 @@ The resume is defined in `resume.json` with the following sections:
   ]
 }
 ```
+
+Set `"hide": true` on an experience item to exclude that job from generated resumes while keeping the data in `resume.json` for later versions.
 
 ## Customization
 
