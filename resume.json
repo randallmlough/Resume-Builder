@@ -8,14 +8,14 @@
     "github": "github.com/randallmlough",
     "website": "https://www.randyLough.com"
   },
-  "summary": "AI-fluent senior full-stack product engineer who owns ambiguous work across web, mobile, backend, and internal tools. Strong in TypeScript, React, React Native, Django/Python, Go, and product analytics, with recent experience rebuilding conversion-critical funnels and helping teams adopt practical AI-assisted development workflows. Known for clear planning, reliable execution, and tying engineering work back to user and business outcomes.",
+  "summary": "Senior full-stack product engineer working across web, mobile, backend, and internal tools. I build with TypeScript, React, React Native, Django/Python, and Go. Recent work includes signup and checkout rebuilds, AI-assisted development practices, and product analytics. I take loosely defined projects from the first open questions through release.",
   "experience": [
     {
       "company": "Duckbill",
       "location": "Remote",
       "startDate": "October 2025",
       "endDate": "July 2026",
-      "overview": "A consumer AI product where members could hand off a wide range of everyday tasks to software agents, with human operators involved when judgment or follow-through was needed.",
+      "overview": "Duckbill used software agents, backed by human operators, to handle everyday tasks for members.",
       "technologies": ["TypeScript", "React", "React Native", "Django", "Playwright"],
       "positions": [
         {
@@ -24,11 +24,11 @@
           "endDate": "July 2026",
           "type": "full-time",
           "responsibilities": [
-            "Led the rebuild of the signup flow from account creation through checkout and activation across web and native apps.",
-            "Added event tracking across the signup funnel so the team could measure where users dropped off and confirm conversion improvements.",
-            "Owned ambiguous product work end to end, from clarifying open questions through implementation, testing, and release.",
-            "Improved the member chat interface that connected users with Duckbill's AI agent, including better support for task-specific widgets.",
-            "Set up AI-assisted coding workflows and team practices that helped the frontend team move faster."
+            "Rebuilt the signup flow across web and native apps, covering account creation, checkout, and activation.",
+            "Instrumented the signup funnel so the team could find drop-off points and verify changes in conversion.",
+            "Took loosely defined product work from open questions to implementation, testing, and release.",
+            "Updated the member chat interface for conversations with Duckbill's AI agent and added support for task-specific widgets.",
+            "Introduced AI-assisted coding workflows and team practices to speed up frontend work."
           ]
         }
       ]
@@ -38,7 +38,7 @@
       "location": "Remote",
       "startDate": "October 2023",
       "endDate": "Present",
-      "overview": "An end-to-end appraisal management platform serving lenders and appraisers, handling everything from order distribution and payments to compliance and credential verification.",
+      "overview": "An appraisal management platform for lenders and appraisers. It covers order distribution, payments, compliance, and credential verification.",
       "technologies": ["Node","NextJS", "TypeScript", "GraphQL", "PostgreSQL", "Redis", "Prisma", "Playwright", "Vitest"],
       "positions": [
         {
@@ -47,10 +47,10 @@
           "endDate": "Present",
           "type": "part-time",
           "responsibilities": [
-            "Architected appraiser inspection scheduler that allowed appraisers to view, edit, and create inspections on their account.",
-            "Developed organizations testing strategy by using a mixture of unit, integration, and end-to-end tests to ensure application reliability and maintainability.",
-            "Built CI/CD pipelines with GitHub Actions, enabling daily production releases with near-zero rollback incidents.",
-            "Designed end-to-end testing using Playwright, enhancing application stability and reduced regression issues."
+            "Designed and built an inspection scheduler where appraisers could view, create, and edit inspections.",
+            "Defined the organization's testing strategy across unit, integration, and end-to-end tests.",
+            "Built GitHub Actions CI/CD pipelines that supported daily production releases with near-zero rollbacks.",
+            "Added Playwright end-to-end coverage to reduce regressions and stabilize releases."
           ]
         }
       ]
@@ -58,7 +58,7 @@
     {
       "company": "Zena",
       "location": "Remote",
-      "overview": "A fintech company offering project-based charge cards with AI-powered automations and interactions.",
+      "overview": "A fintech company that offered project-based charge cards, AI automations, and conversational tools.",
       "technologies": ["NextJS", "TypeScript", "GraphQL", "PostgreSQL", "Redis", "Prisma", "Django", "HTMX", "Python"],
       "positions": [
         {
@@ -66,12 +66,12 @@
           "startDate": "July 2025",
           "endDate": "September 2025",
           "responsibilities": [
-            "Wrote technical specifications covering the full scope of project requirements, which lead to on-time deliverables and minimized scope creep.",
-            "Frontend project lead for company-wide app redesign – built and documented a reusable component library, authored a SPA-like request pattern for HTMX that improved UX responsiveness, and collaborated with design/product to deliver a modernized UI that accelerated feature development.",
-            "Led end-to-end development of AI/LLM Agent UI Chat System, a critical AI feature that became the foundation for all AI conversations at Zena, involving technical planning, proof-of-concept development, and full implementation.",
-            "Established frontend best practices and became team's HTMX subject matter expert, creating patterns and standards that improved team velocity and code quality across major feature releases.",
-            "Designed and built future-proof dynamic tool system that replaced rigid static architecture, enabling flexible AI agent capabilities and unblocking product development for advanced features.",
-            "Delivered proactive technical solutions including entitlements system architecture that anticipated future business needs beyond simple enabled/disabled checks to support numerical limits and complex permissions."
+            "Wrote technical specifications that kept project scope clear and deliveries on schedule.",
+            "Led the frontend work for a company-wide redesign. Built and documented a reusable component library, then wrote an HTMX request pattern for SPA-like navigation. Worked with design and product on the UI. The shared patterns made the interface more responsive and sped up later feature work.",
+            "Planned and built Zena's AI agent chat UI from proof of concept through implementation. It became the base for every AI conversation in the product.",
+            "Became the team's HTMX point person and documented frontend patterns for use across major releases.",
+            "Replaced a static tool architecture with a dynamic system so AI agents could support a wider range of tools.",
+            "Designed an entitlements system that handled numeric limits and complex permissions in addition to on/off feature checks."
           ]
         },
         {
@@ -79,12 +79,11 @@
           "startDate": "October 2023",
           "endDate": "July 2025",
           "responsibilities": [
-            "Delivered key product features, collaborating cross-functionally with product teams to scope requirements and ensure timely delivery with minimal obstacles.",
-            "Implemented backend search functionality using OpenSearch for import transactions feature, contributing to smooth project execution and improved user experience.",
-            "Enhanced developer experience by introducing GraphQL schema validation CI process and implemented error handling patterns.",
-            "Pioneered on-call program development, helping establish and refine processes before scaling to additional team members, demonstrating leadership in operational excellence.",
-            "Led technical presentations on GraphQL vs REST architecture decisions, facilitating team knowledge sharing and strategic technology discussions.",
-            "Managed weekly engineering retrospectives, fostering team improvement culture and identifying process optimization opportunities."
+            "Added OpenSearch-backed search for imported transactions.",
+            "Added GraphQL schema validation to CI and standardized error handling.",
+            "Started Zena's on-call program and refined the process before more engineers joined the rotation.",
+            "Presented the team's GraphQL-versus-REST architecture options and tradeoffs.",
+            "Ran weekly engineering retrospectives focused on practical process changes."
           ]
         }
       ]
@@ -92,7 +91,7 @@
     {
       "company": "Beam",
       "location": "Remote",
-      "overview": "An employee benefits platform through offering self-service tools and AI-powered underwriting.",
+      "overview": "An employee benefits platform with self-service tools and AI-assisted underwriting.",
       "technologies": ["Ruby", "Ruby on Rails", "NextJS","MySQL", "Redis"],
       "positions": [
         {
@@ -100,10 +99,10 @@
           "startDate": "June 2021",
           "endDate": "March 2023",
           "responsibilities": [
-            "Led frontend application rewrite using TypeScript and Next.js, improving codebase maintainability, scalability, and enabling 40% faster feature development cycles.",
-            "Architected and developed high-performance internal CLI tool using Go, implementing comprehensive test suites and robust CI/CD pipeline for enterprise-scale deployment.",
-            "Mentored engineering team on TypeScript, Next.js, and modern frontend development practices, accelerating team adoption of new technologies and best practices.",
-            "Provided technical guidance and mentorship to junior developers, particularly in Go language proficiency and system design principles."
+            "Led a TypeScript and Next.js frontend rewrite that cut feature development cycles by 40% and made the codebase easier to maintain.",
+            "Built an internal Go CLI with tests and a CI/CD pipeline for company-wide use.",
+            "Helped the engineering team adopt TypeScript, Next.js, and current frontend practices.",
+            "Mentored junior engineers in Go and system design."
           ]
         },
         {
@@ -111,9 +110,8 @@
           "startDate": "October 2020",
           "endDate": "June 2021",
           "responsibilities": [
-            "Implemented comprehensive testing strategies that improved application stability, reduced production bugs, and enhanced future compatibility.",
-            "Enhanced application security, performance, and maintainability through continuous architecture improvements and code optimization.",
-            "Maintained and improved existing codebases, ensuring code quality and performance."
+            "Expanded test coverage to reduce production bugs and make future changes safer.",
+            "Improved application security and performance while simplifying the architecture."
           ]
         }
       ]
@@ -129,10 +127,10 @@
           "startDate": "June 2016",
           "endDate": "August 2019",
           "responsibilities": [
-            "Designed, built, and deployed custom marketing website from scratch, saving tens of thousands in development costs while improving mobile responsiveness and user conversion funnels.",
-            "Developed and executed multi-channel marketing strategy that established company as industry thought leader, achieving 35% month-over-month growth in organic search traffic.",
-            "Drove exceptional business growth with 840% increase in demo requests and 1500% increase in contract generation through integrated content marketing campaigns.",
-            "Created comprehensive content marketing portfolio including blog posts, ebooks, case studies, videos, webinars, and paid advertisements to support lead generation."
+            "Built and launched the company's custom marketing site from scratch, saving tens of thousands of dollars and improving its mobile experience and conversion funnels.",
+            "Ran a multichannel marketing strategy that grew organic search traffic 35% month over month.",
+            "Increased demo requests 840% and contract generation 1,500% through coordinated content campaigns.",
+            "Produced blog posts, ebooks, case studies, videos, webinars, and paid ads for lead generation."
           ]
         }
       ]
@@ -141,23 +139,23 @@
   "projects": [
     {
       "name": "Resume Builder",
-      "description": "A simple resume builder that takes a JSON object and generates a modern, AST friendly resume using Go and LaTex.",
-      "technologies": ["Go", "LaTex"],
+      "description": "A Go resume builder that turns JSON into an ATS-friendly LaTeX resume.",
+      "technologies": ["Go", "LaTeX"],
       "github": "https://github.com/randallmlough/Resume-Builder",
       "items": [
-        "Designed a resume builder application using Go and LaTex, enabling myself (and others) to create professional resumes from structured JSON data.",
-        "This resume you are currently viewing was generated using this tool."
+        "Built the tool to generate resumes from structured JSON for my own use and for others.",
+        "This resume was generated with it."
       ]
     },
 
     {
       "name": "PGX Scan",
-      "description": "A once popular plugin for the PGX library that provides a simple and efficient way to map SQL query results to Go structs.",
+      "description": "A PGX plugin that maps SQL query results to Go structs.",
       "technologies": ["Go", "PostgreSQL", "Docker"],
       "github": "https://github.com/randallmlough/pgxscan",
       "items": [
-        "Developed and maintained a popular Go library extending PostgreSQL PGX driver capabilities, enabling seamless scanning from database queries to Go structs and complex data types.",
-        "Implemented advanced struct mapping features including JSON column support, nested struct scanning, and flexible join table handling with configurable column notation strategies."
+        "Maintained a Go library that extended PGX with direct scanning from query results into Go structs and custom data types.",
+        "Added JSON column support, nested struct scanning, and configurable join-table column notation."
       ]
     }
   ],
