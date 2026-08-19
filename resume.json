@@ -139,6 +139,16 @@
   ],
   "projects": [
     {
+      "name": "Don't Forget",
+      "description": "A collaborative, multi-tenant iOS app that works offline.",
+      "technologies": ["React Native", "Postgres", "Docker", "Hono"],
+      "items": [
+        "Built the app as a full-stack TypeScript monorepo with an Expo/React Native iOS client, a Hono API, a TanStack web app, shared Zod contracts, and Drizzle/Postgres storage.",
+        "Used PowerSync and OP-SQLite for offline list and item updates, reactive queries, and background sync. Added tombstones and last-writer-wins conflict handling.",
+        "Built household sharing with Clerk authentication, membership-scoped replication, server-side row authorization, and role-based permissions. Members can join through invitations or reusable household codes.",
+      ]
+    },
+    {
       "name": "Resume Builder",
       "description": "A Go resume builder that turns JSON into an ATS-friendly LaTeX resume.",
       "technologies": ["Go", "LaTeX"],
@@ -148,12 +158,12 @@
         "This resume was generated with it."
       ]
     },
-
     {
       "name": "PGX Scan",
       "description": "A PGX plugin that maps SQL query results to Go structs.",
       "technologies": ["Go", "PostgreSQL", "Docker"],
       "github": "https://github.com/randallmlough/pgxscan",
+      "hide": true,
       "items": [
         "Maintained a Go library that extended PGX with direct scanning from query results into Go structs and custom data types.",
         "Added JSON column support, nested struct scanning, and configurable join-table column notation."
