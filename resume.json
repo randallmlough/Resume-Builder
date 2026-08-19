@@ -15,8 +15,8 @@
       "location": "Remote",
       "startDate": "October 2025",
       "endDate": "July 2026",
-      "overview": "test",
-      "technologies": ["TypeScript", "React", "React Native", "Django","Playwright"],
+      "overview": "A consumer product that helped members hand off everyday tasks through a mix of software, internal tools, and human support.",
+      "technologies": ["TypeScript", "React", "React Native", "Django", "Playwright"],
       "positions": [
         {
           "title": "Senior Software Engineer",
@@ -24,7 +24,11 @@
           "endDate": "July 2026",
           "type": "full-time",
           "responsibilities": [
-            "test"
+            "Led the rebuild of the signup flow from account creation through checkout and activation across web and native apps.",
+            "Added event tracking across the signup funnel so the team could measure where users dropped off and confirm conversion improvements.",
+            "Owned ambiguous product work end to end, from clarifying open questions through implementation, testing, and release.",
+            "Helped improve user-facing task flows, including escalation visibility and VIP customer experience edge cases.",
+            "Set up AI-assisted coding workflows and team practices that helped the frontend team move faster."
           ]
         }
       ]
