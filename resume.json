@@ -36,15 +36,15 @@
     {
       "company": "Appraisal Desk",
       "location": "Remote",
-      "startDate": "October 2023",
-      "endDate": "Present",
+      "startDate": "June 2025",
+      "endDate": "October 2025",
       "overview": "An appraisal management platform for lenders and appraisers. It covers order distribution, payments, compliance, and credential verification.",
       "technologies": ["Node","NextJS", "TypeScript", "GraphQL", "PostgreSQL", "Redis", "Prisma", "Playwright", "Vitest"],
       "positions": [
         {
           "title": "Freelance Software Engineer",
           "startDate": "June 2025",
-          "endDate": "Present",
+          "endDate": "October 2025",
           "type": "part-time",
           "responsibilities": [
             "Designed and built an inspection scheduler where appraisers could view, create, and edit inspections.",

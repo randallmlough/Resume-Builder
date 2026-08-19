@@ -83,12 +83,6 @@
 \newcommand{\resumeExperienceMinimumSpace}{10\baselineskip}
 \newcommand{\resumeRoleMinimumSpace}{5\baselineskip}
 
-\newcommand{\resumeSkillCategory}[2]{%
-    \noindent\begin{tabularx}{\linewidth}{@{}>{\bfseries}l@{\hspace{0.35em}}X@{}}%
-        #1: & #2
-    \end{tabularx}\par
-}
-
 \newcommand{\resumeItem}[1]{
     \item\small{
         {#1 \vspace{-2pt}}
@@ -274,9 +268,11 @@
 \section{Technical Skills}
 \begin{itemize}[leftmargin=0.15in, label={}]
 \small{\item{
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l@{\hspace{0.75em}}>{\raggedleft\arraybackslash}X@{}}
 {{- range $cat := (orderedSkills $details.Skills) }}
-    \resumeSkillCategory{ {{- $cat.Name}}}{ {{ range $i, $v := $cat.Values }}{{if $i}}, {{end}}{{$v}}{{end}}}
+    {{- $cat.Name}}: & {{ range $i, $v := $cat.Values }}{{if $i}}, {{end}}{{$v}}{{end}} \\[4pt]
 {{- end }}
+\end{tabularx}
 }}
 \end{itemize}
 
