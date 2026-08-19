@@ -1,4 +1,5 @@
-{{- /*gotype: resume.Resume*/ -}}
+{{- /*gotype: github.com/randallmlough/resume-builder/internal/resume.Data*/ -}}
+{{$details := .Resume}}
 %-------------------------
 % Resume in LateX
 % Author : Randy Lough
@@ -133,14 +134,14 @@
             % Overview (spans both columns)
             \tl_if_blank:VTF \l_resume_overview_tl
                 { }
-                { \multicolumn{2}{@{}l@{}}{\textcolor{mutedColor}{\footnotesize \tl_use:N \l_resume_overview_tl}}\\[3pt] }
+                { \multicolumn{2}{@{}l@{}}{\parbox{\dimexpr0.97\textwidth\relax}{\footnotesize\textit{\tl_use:N \l_resume_overview_tl}}}\\[3pt] }
         \end{tabular*}\vspace{1pt}%
         \group_end:
     }
 \ExplSyntaxOff
 
 \newcommand{\resumeSubheadingLocation}[3]{
-    \vspace{-1pt}\item
+    \vspace{3pt}\item
     \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
         \textbf{#1} & #2 \\
         \textit{\small#3} \\
@@ -185,22 +186,22 @@
 
 %----------HEADING-----------------
 \begin{center}
-{\headingfont\textcolor{accentColor}{\textbf{\Huge \scshape {{.Name}}}}} \\ \vspace{1pt}
-\small \href{tel:{{.Contact.Phone}}}{ {{- .Contact.Phone}}} $|$ \href{mailto:{{.Contact.Email}}}{ {{- .Contact.Email}}} $|$
-\href{https://www.{{.Contact.LinkedIn}}}{ {{- .Contact.LinkedIn}}} $|$
-\href{https://www.{{.Contact.GitHub}}}{ {{- .Contact.GitHub}}}
+{\headingfont\textcolor{accentColor}{\textbf{\Huge \scshape {{$details.Name}}}}} \\ \vspace{1pt}
+\small \href{tel:{{$details.Contact.Phone}}}{ {{- $details.Contact.Phone}}} $|$ \href{mailto:{{$details.Contact.Email}}}{ {{- $details.Contact.Email}}} $|$
+\href{https://www.{{$details.Contact.LinkedIn}}}{ {{- $details.Contact.LinkedIn}}} $|$
+\href{https://www.{{$details.Contact.GitHub}}}{ {{- $details.Contact.GitHub}}}
 \end{center}
 
 {{- if not .Config.Summary.Hide}}
 %-----------OVERVIEW-----------------
 \section{Overview}
-\small {{latexEscape .Summary}}
+\small {{latexEscape $details.Summary}}
 {{ end -}}
 
 %-----------EXPERIENCE-----------------
 \section{Experience}
 \resumeSubHeadingListStart
-{{ range $experience :=.Experience -}}
+{{ range $experience :=$details.Experience -}}
     \resumeExperienceHeading[
     company={ {{- $experience.Company}}},
     {{ if and (not $.Config.Experience.HideLocation) (ne $experience.Location "") -}}
@@ -234,7 +235,7 @@
 %-----------PROJECTS-----------
 \section{Projects}
 \resumeSubHeadingListStart
-{{ range .Projects -}}
+{{ range $details.Projects -}}
     \resumeProjectHeading
     {\textbf{ {{- .Name}}} $|$ \emph{ {{- join .Technology ", "}}}}{ \href{ {{- .Github}}}{\underline{Github}}}
     %\small{ { {{- .Description}} \vspace{2pt}}}
@@ -250,7 +251,7 @@
 \section{Technical Skills}
 \begin{itemize}[leftmargin=0.15in, label={}]
 \small{\item{
-{{- range $cat := (orderedSkills .Skills) }}
+{{- range $cat := (orderedSkills $details.Skills) }}
     \textbf{ {{- $cat.Name}}}{: {{ range $i, $v := $cat.Values }}{{if $i}}, {{end}}{{$v}}{{end}}} \\
 {{- end }}
 }}
@@ -259,7 +260,7 @@
 %-----------EDUCATION-----------------
 \section{Education}
 \resumeSubHeadingListStart
-{{- range .Education}}
+{{- range $details.Education}}
     \resumeSubheadingLocation
     { {{- .Institution}}{{if ne .College ""}}, {{.College}}{{end}}}{ {{- .StartDate}} — {{.EndDate}}}
     { {{- .Degree}}{{if ne .GPA ""}}; GPA: {{.GPA}}{{end}}}

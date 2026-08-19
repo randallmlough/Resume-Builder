@@ -8,15 +8,34 @@
     "github": "github.com/randallmlough",
     "website": "https://www.randyLough.com"
   },
-  "summary": "Highly skilled and motivated software engineer with over 8 years of experience designing, developing, and deploying websites, web applications, tools, and libraries in a variety of languages. Proven track record of quickly learning complex concepts, delivering high-quality work, and collaborating with cross-functional teams to ensure successful project outcomes.",
+  "summary": "Senior full-stack engineer with 8+ years experience delivering high-impact features, leading architecture decisions, and scaling fintech and SaaS systems. Known for driving AI product initiatives, mentoring teams, and shipping resilient, production-ready code in modern codebases.",
   "experience": [
+    {
+      "company": "Duckbill",
+      "location": "Remote",
+      "startDate": "October 2025",
+      "endDate": "July 2026",
+      "overview": "test",
+      "technologies": ["TypeScript", "React", "React Native", "Django","Playwright"],
+      "positions": [
+        {
+          "title": "Senior Software Engineer",
+          "startDate": "October 2025",
+          "endDate": "July 2026",
+          "type": "full-time",
+          "responsibilities": [
+            "test"
+          ]
+        }
+      ]
+    },
     {
       "company": "Appraisal Desk",
       "location": "Remote",
       "startDate": "October 2023",
       "endDate": "Present",
-      "overview": "something about the company",
-      "technologies": ["NextJS", "TypeScript", "GraphQL", "PostgreSQL", "Redis", "Prisma"],
+      "overview": "An end-to-end appraisal management platform serving lenders and appraisers, handling everything from order distribution and payments to compliance and credential verification.",
+      "technologies": ["Node","NextJS", "TypeScript", "GraphQL", "PostgreSQL", "Redis", "Prisma", "Playwright", "Vitest"],
       "positions": [
         {
           "title": "Freelance Software Engineer",
@@ -24,9 +43,10 @@
           "endDate": "Present",
           "type": "part-time",
           "responsibilities": [
+            "Architected appraiser inspection scheduler that allowed appraisers to view, edit, and create inspections on their account.",
             "Developed organizations testing strategy by using a mixture of unit, integration, and end-to-end tests to ensure application reliability and maintainability.",
-            "Implemented CI/CD pipelines using GitHub Actions, improving deployment efficiency and reliability.",
-            "Architected end-to-end testing using Playwright, enhancing application stability and reduced regression issues."
+            "Built CI/CD pipelines with GitHub Actions, enabling daily production releases with near-zero rollback incidents.",
+            "Designed end-to-end testing using Playwright, enhancing application stability and reduced regression issues."
           ]
         }
       ]
@@ -34,12 +54,16 @@
     {
       "company": "Zena",
       "location": "Remote",
+      "overview": "A fintech company offering project-based charge cards with AI-powered automations and interactions.",
+      "technologies": ["NextJS", "TypeScript", "GraphQL", "PostgreSQL", "Redis", "Prisma", "Django", "HTMX", "Python"],
       "positions": [
         {
           "title": "Senior Software Engineer",
           "startDate": "July 2025",
           "endDate": "September 2025",
           "responsibilities": [
+            "Wrote technical specifications covering the full scope of project requirements, which lead to on-time deliverables and minimized scope creep.",
+            "Frontend project lead for company-wide app redesign – built and documented a reusable component library, authored a SPA-like request pattern for HTMX that improved UX responsiveness, and collaborated with design/product to deliver a modernized UI that accelerated feature development.",
             "Led end-to-end development of AI/LLM Agent UI Chat System, a critical AI feature that became the foundation for all AI conversations at Zena, involving technical planning, proof-of-concept development, and full implementation.",
             "Established frontend best practices and became team's HTMX subject matter expert, creating patterns and standards that improved team velocity and code quality across major feature releases.",
             "Designed and built future-proof dynamic tool system that replaced rigid static architecture, enabling flexible AI agent capabilities and unblocking product development for advanced features.",
@@ -55,7 +79,8 @@
             "Implemented backend search functionality using OpenSearch for import transactions feature, contributing to smooth project execution and improved user experience.",
             "Enhanced developer experience by introducing GraphQL schema validation CI process and implemented error handling patterns.",
             "Pioneered on-call program development, helping establish and refine processes before scaling to additional team members, demonstrating leadership in operational excellence.",
-            "Led technical presentations on GraphQL vs REST architecture decisions, facilitating team knowledge sharing and strategic technology discussions."
+            "Led technical presentations on GraphQL vs REST architecture decisions, facilitating team knowledge sharing and strategic technology discussions.",
+            "Managed weekly engineering retrospectives, fostering team improvement culture and identifying process optimization opportunities."
           ]
         }
       ]
@@ -63,6 +88,8 @@
     {
       "company": "Beam",
       "location": "Remote",
+      "overview": "An employee benefits platform through offering self-service tools and AI-powered underwriting.",
+      "technologies": ["Ruby", "Ruby on Rails", "NextJS","MySQL", "Redis"],
       "positions": [
         {
           "title": "Software Engineer",
@@ -90,27 +117,17 @@
     {
       "company": "RetailOps",
       "location": "San Diego, CA",
+      "overview": "A cloud-based back-office platform that automates order, inventory, and warehouse workflows.",
       "positions": [
         {
           "title": "Marketing Manager and Web Developer",
-          "startDate": "June 2018",
+          "startDate": "June 2016",
           "endDate": "August 2019",
           "responsibilities": [
             "Designed, built, and deployed custom marketing website from scratch, saving tens of thousands in development costs while improving mobile responsiveness and user conversion funnels.",
             "Developed and executed multi-channel marketing strategy that established company as industry thought leader, achieving 35% month-over-month growth in organic search traffic.",
             "Drove exceptional business growth with 840% increase in demo requests and 1500% increase in contract generation through integrated content marketing campaigns.",
             "Created comprehensive content marketing portfolio including blog posts, ebooks, case studies, videos, webinars, and paid advertisements to support lead generation."
-          ]
-        },
-        {
-          "title": "Inbound Marketing Specialist",
-          "startDate": "June 2016",
-          "endDate": "June 2018",
-          "responsibilities": [
-            "Designed, built, and measured landing pages, email campaigns, and paid advertisements using HubSpot, Google Ads, and LinkedIn Ads to drive lead generation.",
-            "Developed content strategy and marketing materials to promote integrated retail operations platform including POM, PIM, DOM, WMS, and mobile applications.",
-            "Managed lead generation and nurturing processes through content marketing, SEO optimization, and marketing automation workflows.",
-            "Analyzed campaign performance metrics and customer acquisition data to optimize marketing funnel conversion rates."
           ]
         }
       ]
@@ -127,16 +144,7 @@
         "This resume you are currently viewing was generated using this tool."
       ]
     },
-    {
-      "name": "Code Bot",
-      "description": "CLI tool that explores LLMs through personalized, plugin-driven code automation. Project was created pre Claude Code, Cursor, etc.",
-      "technologies": ["Go"],
-      "github": "https://github.com/randallmlough/code-bot",
-      "items": [
-        "Built AI-powered coding assistant using OpenAI GPT API and Go, enabling automated code generation, file creation, and project structure understanding through prompt engineering.",
-        "Developed CLI tool with interactive chat interface supporting file input/output operations, custom prompt injection, and automated conversation priming for improved AI response accuracy."
-      ]
-    },
+
     {
       "name": "PGX Scan",
       "description": "A once popular plugin for the PGX library that provides a simple and efficient way to map SQL query results to Go structs.",
@@ -149,6 +157,14 @@
     }
   ],
   "education": [
+    {
+      "institution": "App Academy",
+      "degree": "Computer Software Engineering",
+      "startDate": "2019",
+      "endDate": "2020",
+      "location": "",
+      "gpa": ""
+    },
     {
       "institution": "University of Arizona",
       "college": "Eller College of Management",
@@ -216,6 +232,20 @@
       "years": "5 years",
       "category": "Frameworks and Libraries",
       "keywords": ["Next.js"]
+    },
+    {
+      "name": "Prisma",
+      "level": "Advanced",
+      "years": "5 years",
+      "category": "Frameworks and Libraries",
+      "keywords": []
+    },
+    {
+      "name": "Vitest",
+      "level": "Intermediate",
+      "years": "3 years",
+      "category": "Frameworks and Libraries",
+      "keywords": []
     },
     {
       "name": "Ruby on Rails",

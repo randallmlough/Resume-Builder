@@ -1,4 +1,5 @@
 template_name: "single-column"
+cover_letter_template_name: "cover-letter"
 accent_color: 1f79c7
 muted_color: 5a5a5a
 font_sans: "merriweather-sans"
@@ -9,4 +10,4 @@ experience:
   hide_overview: false
   hide_location: false
   hide_date: true
-  hide_technologies: false
+  hide_technologies: true

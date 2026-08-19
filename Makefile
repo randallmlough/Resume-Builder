@@ -5,7 +5,7 @@
 ##@ Commands
 
 .PHONY: build
-build: clean gen create_pdf ## Run development application *common*
+build: gen create_pdf ## Run development application *common*
 
 .PHONY: gen
 gen:  ## Generate Tex file *common*
@@ -16,6 +16,11 @@ gen:  ## Generate Tex file *common*
 create_pdf: clean ## Create PDF
 	@echo 'Creating PDF resume file'
 	@docker run --rm -i -v "$(shell pwd)":/data resume/latex lualatex -output-directory=dist resume.tex
+
+.PHONY: create_cover_letter
+create_cover_letter: clean ## Create PDF
+	@echo 'Creating PDF resume file'
+	@docker run --rm -i -v "$(shell pwd)":/data resume/latex lualatex -output-directory=dist cover-letter.tex
 
 .PHONY: build_image
 build_image: ## Build Docker image

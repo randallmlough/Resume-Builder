@@ -1,50 +1,19 @@
-package main
+package resume
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"maps"
 	"os"
-	"slices"
+	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/randallmlough/resume-builder/internal/config"
+	"github.com/randallmlough/resume-builder/internal/util"
 )
 
-func LoadResume(filePath string) (*Resume, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open resume file: %w", err)
-	}
-	defer file.Close()
-
-	bytes, err := io.ReadAll(file)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read resume file: %w", err)
-	}
-
-	var resume Resume
-	if err := json.Unmarshal(bytes, &resume); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal resume file: %w", err)
-	}
-
-	insertEnvDetails(&resume)
-
-	return &resume, nil
-}
-
-func insertEnvDetails(resume *Resume) {
-	phone := os.Getenv("PHONE_NUMBER")
-	if phone != "" {
-		resume.Contact.Phone = phone
-	}
-	email := os.Getenv("EMAIL")
-	if email != "" {
-		resume.Contact.Email = email
-	}
-}
-
-type Resume struct {
+type PersonalDetail struct {
 	Name       string      `json:"name"`
 	Contact    Contact     `json:"contact"`
 	Summary    string      `json:"summary"`
@@ -53,8 +22,6 @@ type Resume struct {
 	Education  []Education `json:"education"`
 	Projects   []Project   `json:"projects,omitempty"`
 	Awards     []string    `json:"awards,omitempty"`
-	// private config field to hold configuration settings
-	Config *Config `json:"-"`
 }
 
 type Contact struct {
@@ -145,58 +112,66 @@ type Project struct {
 	Items       []string `json:"items,omitempty"`
 }
 
-// GenerateLaTeX converts a Resume struct to LaTeX format
-func (r *Resume) GenerateLaTeX(cfg *Config) (string, error) {
-	templateFileName := fmt.Sprintf("%s.tmpl", cfg.TemplateName)
-	templatePath := fmt.Sprintf("templates/%s", templateFileName)
-	tmpl, err := template.New(templateFileName).Funcs(funcMap).ParseFiles(templatePath)
+func LoadPersonalDetails(filePath string) (*PersonalDetail, error) {
+	file, err := os.Open(filePath)
 	if err != nil {
-		return "", fmt.Errorf("failed to parse template: %w", err)
+		return nil, fmt.Errorf("failed to open resume file: %w", err)
 	}
-	r.Config = cfg
-	var result strings.Builder
-	if err := tmpl.Execute(&result, r); err != nil {
-		return "", fmt.Errorf("failed to execute template: %w", err)
+	defer file.Close()
+
+	bytes, err := io.ReadAll(file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read resume file: %w", err)
 	}
 
-	return result.String(), nil
+	var resume PersonalDetail
+	if err := json.Unmarshal(bytes, &resume); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal resume file: %w", err)
+	}
+
+	insertEnvDetails(&resume)
+
+	return &resume, nil
 }
 
-func skillsByCategory(skills []Skill) map[string][]Skill {
-	categorized := make(map[string][]Skill)
-	for _, skill := range skills {
-		category := skill.Category
-		if category == "" {
-			category = "Other"
-		}
-		categorized[category] = append(categorized[category], skill)
+func insertEnvDetails(resume *PersonalDetail) {
+	phone := os.Getenv("PHONE_NUMBER")
+	if phone != "" {
+		resume.Contact.Phone = phone
 	}
-	return categorized
+	email := os.Getenv("EMAIL")
+	if email != "" {
+		resume.Contact.Email = email
+	}
 }
 
-// latexEscape escapes special LaTeX characters and converts newlines
-func latexEscape(s string) string {
-	replacer := strings.NewReplacer(
-		// "\\", "\\textbackslash{}",
-		"{", "\\{",
-		"}", "\\}",
-		"$", "\\$",
-		"&", "\\&",
-		"%", "\\%",
-		"#", "\\#",
-		"^", "\\textasciicircum{}",
-		"_", "\\_",
-		"~", "\\textasciitilde{}",
-		"\n", " \\\\ ", // Convert newlines to LaTeX line breaks
-	)
-	return replacer.Replace(s)
+type Data struct {
+	Resume *PersonalDetail
+	Config *config.Config
+}
+
+// GenerateResume converts a PersonalDetail struct to LaTeX format
+func GenerateResume(r *PersonalDetail, cfg *config.Config) error {
+	latexContent, err := GenerateLaTeX(cfg.TemplateName, funcMap, Data{
+		Resume: r,
+		Config: cfg,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to generate resume latex file: %w", err)
+	}
+
+	dir, err := util.GetProjectPath()
+	if err != nil {
+		return err
+	}
+	filename := filepath.Join(filepath.Dir(dir), "resume.tex")
+	if err := Write(filename, latexContent); err != nil {
+		return err
+	}
+	return nil
 }
 
 var funcMap = template.FuncMap{
-	"skillsByCategory": skillsByCategory,
-	"sortedKeys": func(m map[string][]Skill) []string {
-		return slices.Sorted(maps.Keys(m))
-	},
 	"orderedSkills": orderedSkills,
 	"join":          strings.Join,
 	"latexEscape":   latexEscape,
@@ -227,5 +202,22 @@ func orderedSkills(skills []Skill) []Category {
 		}
 	}
 	return data
+}
 
+// latexEscape escapes special LaTeX characters and converts newlines
+func latexEscape(s string) string {
+	replacer := strings.NewReplacer(
+		// "\\", "\\textbackslash{}",
+		"{", "\\{",
+		"}", "\\}",
+		"$", "\\$",
+		"&", "\\&",
+		"%", "\\%",
+		"#", "\\#",
+		"^", "\\textasciicircum{}",
+		"_", "\\_",
+		"~", "\\textasciitilde{}",
+		"\n", " \\\\ ", // Convert newlines to LaTeX line breaks
+	)
+	return replacer.Replace(s)
 }

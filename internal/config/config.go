@@ -1,10 +1,13 @@
-package main
+package config
 
 import (
+	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/goccy/go-yaml"
+	"github.com/randallmlough/resume-builder/internal/util"
 )
 
 type BaseSection struct {
@@ -35,8 +38,15 @@ type Experience struct {
 }
 
 func LoadConfig() (*Config, error) {
+	dir, err := util.GetProjectPath()
+	if err != nil {
+		return nil, err
+	}
+
 	// load config.yml file
-	file, err := os.Open("config.yml")
+	filename := filepath.Join(filepath.Dir(dir), "config.yml")
+	fmt.Println("Loading config from", filename)
+	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,103 @@
+{{- /*gotype: github.com/randallmlough/resume-builder/internal/resume.CoverLetterData*/ -}}
+{{$details := .Resume}}
+%-------------------------
+% Resume in LateX
+% Author : Randy Lough
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{xcolor}
+
+% Define custom colors
+\definecolor{accentColor}{HTML}{ {{- .Config.AccentColor}}}
+\definecolor{mutedColor}{HTML}{ {{- .Config.MutedColor}}}
+
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontspec}
+\usepackage{xparse, l3keys2e}
+\usepackage{fvextra}
+
+%----------FONT OPTIONS----------
+\setmainfont{merriweather-sans} % Clean sans-serif for body text
+\newfontfamily\headingfont{merriweather} % Elegant serif for headings
+\newfontfamily\serifFont{merriweather} % Alternative serif option
+
+%   Professional Sans-serif fonts:
+%   \setmainfont{DejaVu Sans} % Clean, modern
+%   \setmainfont{Liberation Sans} % Arial alternative
+%   \setmainfont{Carlito} % Calibri alternative
+%   \setmainfont{Clear Sans} % Very clean, modern
+%   \setmainfont{Arimo} % Clean sans-serif
+%
+%   Professional Serif fonts:
+%   \setmainfont{DejaVu Serif} % Classic serif
+%   \setmainfont{Liberation Serif} % Times alternative
+%   \setmainfont{Crimson Pro} % Modern serif
+%   \setmainfont{Cormorant Garamond} % Elegant serif - fav
+
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+\vspace{-4pt}\headingfont\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+{{/*Ensure that generate PDF is machine readable/ATS parsable. Enable if using pdflatex, but keep commented out if using luatex.*/}}
+%\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+
+
+%-------------------------------------------
+
+\begin{document}
+
+%----------HEADING-----------------
+\begin{center}
+    {\headingfont\textcolor{accentColor}{\textbf{\Huge \scshape {{$details.Name}}}}} \\ \vspace{1pt}
+    \small \href{tel:{{$details.Contact.Phone}}}{ {{- $details.Contact.Phone}}} $|$ \href{mailto:{{$details.Contact.Email}}}{ {{- $details.Contact.Email}}} $|$
+    \href{https://www.{{$details.Contact.LinkedIn}}}{ {{- $details.Contact.LinkedIn}}} $|$
+    \href{https://www.{{$details.Contact.GitHub}}}{ {{- $details.Contact.GitHub}}}
+\end{center}
+
+%-----------BODY-----------------
+%\begin{Verbatim}[breaklines,breakanywhere,breaksymbol={},breaksymbolleft={},breaksymbolright={},formatcom=\serifFont,fontsize=\small]
+%\end{Verbatim}
+\begingroup\serifFont\setlength{\parindent}{0pt}\setlength{\parskip}{12pt}
+{{ .Body -}}
+\endgroup
+%-----------SIGNATURE-----------------
+
+
+%-------------------------------------------
+\end{document}
