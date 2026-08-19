@@ -21,6 +21,7 @@ type Config struct {
 	FontSerif    string `yaml:"font_serif"`
 
 	Contact    BaseSection `yaml:"contact"`
+	PageMarker BaseSection `yaml:"page_marker"`
 	Summary    BaseSection `yaml:"summary"`
 	Skills     BaseSection `yaml:"skills"`
 	Experience Experience  `yaml:"experience"`

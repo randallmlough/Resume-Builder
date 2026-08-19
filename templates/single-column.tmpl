@@ -49,9 +49,13 @@
 
 \pagestyle{fancy}
 \fancyhf{} % Clear all header and footer fields
-\fancyfoot{}
+{{- if not .Config.PageMarker.Hide}}
+\fancyfoot[C]{\footnotesize\textcolor{mutedColor}{ {{- $details.Name}}\enspace\textbar\enspace\thepage}}
+{{- end}}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{14pt}
+\setlength{\footskip}{18pt}
 
 % Adjust margins
 \addtolength{\oddsidemargin}{-0.5in}
@@ -68,7 +72,7 @@
 
 % Sections formatting
 \titleformat{\section}{
-\vspace{-4pt}\headingfont\scshape\raggedright\large
+\vspace{-2pt}\headingfont\scshape\raggedright\large
 }{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
 
 {{/*Ensure that generate PDF is machine readable/ATS parsable. Enable if using pdflatex, but keep commented out if using luatex.*/}}
@@ -78,6 +82,12 @@
 % Custom commands
 \newcommand{\resumeExperienceMinimumSpace}{10\baselineskip}
 \newcommand{\resumeRoleMinimumSpace}{5\baselineskip}
+
+\newcommand{\resumeSkillCategory}[2]{%
+    \noindent\begin{tabularx}{\linewidth}{@{}>{\bfseries}l@{\hspace{0.35em}}X@{}}%
+        #1: & #2
+    \end{tabularx}\par
+}
 
 \newcommand{\resumeItem}[1]{
     \item\small{
@@ -139,7 +149,7 @@
             % Overview (spans both columns)
             \tl_if_blank:VTF \l_resume_overview_tl
                 { }
-                { \multicolumn{2}{@{}l@{}}{\parbox{\dimexpr0.97\textwidth\relax}{\footnotesize\textit{\tl_use:N \l_resume_overview_tl}}}\\[3pt] }
+                { \multicolumn{2}{@{}l@{}}{\parbox{\dimexpr0.97\textwidth\relax}{\raggedright\hyphenpenalty=10000\exhyphenpenalty=10000\footnotesize\textcolor{mutedColor}{\tl_use:N \l_resume_overview_tl}}}\\[3pt] }
         \end{tabular*}\vspace{1pt}%
         \group_end:
     }
@@ -182,20 +192,21 @@
 \newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=*, label={}]}
 \newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
 \newcommand{\resumeItemListStart}{\begin{itemize}\vspace{4pt}}
-\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{4pt}} %vspace{-5pt}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{6pt}} %vspace{-5pt}
 
 %-------------------------------------------
 %%%%%%  CV STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \begin{document}
+\thispagestyle{empty}
 
 %----------HEADING-----------------
 \begin{center}
 {\headingfont\textcolor{accentColor}{\textbf{\Huge \scshape {{$details.Name}}}}} \\ \vspace{1pt}
 \small \href{tel:{{$details.Contact.Phone}}}{ {{- $details.Contact.Phone}}} $|$ \href{mailto:{{$details.Contact.Email}}}{ {{- $details.Contact.Email}}} $|$
-\href{https://www.{{$details.Contact.LinkedIn}}}{ {{- $details.Contact.LinkedIn}}} $|$
-\href{https://www.{{$details.Contact.GitHub}}}{ {{- $details.Contact.GitHub}}}
+\href{https://www.{{$details.Contact.LinkedIn}}}{LinkedIn} $|$
+\href{https://www.{{$details.Contact.GitHub}}}{GitHub}
 \end{center}
 
 {{- if not .Config.Summary.Hide}}
@@ -248,7 +259,7 @@
 \resumeSubHeadingListStart
 {{ range $visibleProjects -}}
     \resumeProjectHeading
-    {\textbf{ {{- .Name}}} $|$ \emph{ {{- join .Technology ", "}}}}{ \href{ {{- .Github}}}{\underline{Github}}}
+    {\textbf{ {{- .Name}}} $|$ \emph{ {{- join .Technology ", "}}}}{ \href{ {{- .Github}}}{\underline{GitHub}}}
     %\small{ { {{- .Description}} \vspace{2pt}}}
     \resumeItemListStart
         {{- range .Items }}
@@ -264,7 +275,7 @@
 \begin{itemize}[leftmargin=0.15in, label={}]
 \small{\item{
 {{- range $cat := (orderedSkills $details.Skills) }}
-    \textbf{ {{- $cat.Name}}}{: {{ range $i, $v := $cat.Values }}{{if $i}}, {{end}}{{$v}}{{end}}} \\
+    \resumeSkillCategory{ {{- $cat.Name}}}{ {{ range $i, $v := $cat.Values }}{{if $i}}, {{end}}{{$v}}{{end}}}
 {{- end }}
 }}
 \end{itemize}

@@ -4,6 +4,8 @@ accent_color: 1f79c7
 muted_color: 5a5a5a
 font_sans: "merriweather-sans"
 font_serif: "merriweather"
+page_marker:
+  hide: false
 summary:
   hide: false
 experience:

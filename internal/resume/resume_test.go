@@ -80,6 +80,50 @@ func TestVisibleEducationFiltersHiddenEducation(t *testing.T) {
 	}
 }
 
+func TestSingleColumnTemplatePageMarkerVisibility(t *testing.T) {
+	resume := &PersonalDetail{Name: "Test Person"}
+
+	tests := []struct {
+		name       string
+		pageMarker config.BaseSection
+		wantMarker bool
+	}{
+		{
+			name:       "shown by default",
+			pageMarker: config.BaseSection{},
+			wantMarker: true,
+		},
+		{
+			name:       "hidden by config",
+			pageMarker: config.BaseSection{Hide: true},
+			wantMarker: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &config.Config{
+				AccentColor: "1f79c7",
+				MutedColor:  "5a5a5a",
+				PageMarker:  tt.pageMarker,
+			}
+
+			got, err := GenerateLaTeX("single-column", funcMap, Data{
+				Resume: resume,
+				Config: cfg,
+			})
+			if err != nil {
+				t.Fatalf("expected template to render, got error: %v", err)
+			}
+
+			hasMarker := strings.Contains(got, `\fancyfoot[C]`)
+			if hasMarker != tt.wantMarker {
+				t.Errorf("page marker presence = %t, want %t", hasMarker, tt.wantMarker)
+			}
+		})
+	}
+}
+
 func TestSingleColumnTemplateSkipsHiddenExperience(t *testing.T) {
 	resume := &PersonalDetail{
 		Name: "Test Person",
