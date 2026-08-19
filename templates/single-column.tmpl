@@ -253,7 +253,9 @@
 \resumeSubHeadingListStart
 {{ range $visibleProjects -}}
     \resumeProjectHeading
-    {\textbf{ {{- .Name}}} $|$ \emph{ {{- join .Technology ", "}}}}{ \href{ {{- .Github}}}{\underline{GitHub}}}
+    {\textbf{ {{- .Name}}} $|$ \emph{ {{- join .Technology ", "}}}}{
+    {{- if .Github }} \href{ {{- .Github}}}{\underline{GitHub}}{{ end -}}
+    }
     %\small{ { {{- .Description}} \vspace{2pt}}}
     \resumeItemListStart
         {{- range .Items }}

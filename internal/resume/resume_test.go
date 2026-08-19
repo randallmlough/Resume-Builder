@@ -228,6 +228,57 @@ func TestSingleColumnTemplateSkipsHiddenProjects(t *testing.T) {
 	}
 }
 
+func TestSingleColumnTemplateProjectGitHubLinkVisibility(t *testing.T) {
+	tests := []struct {
+		name     string
+		github   string
+		wantLink bool
+	}{
+		{
+			name:     "shown when URL is present",
+			github:   "https://github.com/test/project",
+			wantLink: true,
+		},
+		{
+			name:     "hidden when URL is empty",
+			github:   "",
+			wantLink: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resume := &PersonalDetail{
+				Name: "Test Person",
+				Projects: []Project{
+					{
+						Name:       "Test Project",
+						Github:     tt.github,
+						Technology: []string{"Go"},
+					},
+				},
+			}
+			cfg := &config.Config{
+				AccentColor: "1f79c7",
+				MutedColor:  "5a5a5a",
+			}
+
+			got, err := GenerateLaTeX("single-column", funcMap, Data{
+				Resume: resume,
+				Config: cfg,
+			})
+			if err != nil {
+				t.Fatalf("expected template to render, got error: %v", err)
+			}
+
+			hasLink := strings.Contains(got, `\underline{GitHub}`)
+			if hasLink != tt.wantLink {
+				t.Errorf("project GitHub link presence = %t, want %t", hasLink, tt.wantLink)
+			}
+		})
+	}
+}
+
 func TestSingleColumnTemplateOmitsProjectsSectionWhenAllProjectsAreHidden(t *testing.T) {
 	resume := &PersonalDetail{
 		Name: "Test Person",
