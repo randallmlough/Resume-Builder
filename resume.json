@@ -11,16 +11,16 @@
   "summary": "Senior full-stack product engineer who is comfortable moving between stacks to solve the problem in front of me. I enjoy work that starts without a clear path and calls for investigation and careful tradeoffs. My current interest is in AI, both in the products I build and in how engineering teams work with it. I use it to move faster and smarter.",
   "experience": [
     {
-      "company": "Torrey Pines Golf Course",
-      "location": "Freelance",
-      "startDate": "October 2026",
+      "company": "Freelance and Consulting",
+      "location": "Remote",
+      "startDate": "June 2025",
       "endDate": "Present",
       "overview": "Shopify storefront and custom Shopify Admin app.",
       "technologies": ["React", "React Router", "Shopify Hydrogen", "TypeScript", "Storybook", "Playwright", "GraphQL", "Cloudflare Workers"],
-      "website": "https://www.torrey.randylough.dev",
+      "website": "https://www.randylough.com",
       "positions": [
         {
-          "title": "Freelance Software Engineer",
+          "title": "Torrey Pines Golf Course",
           "startDate": "October 2026",
           "endDate": "December 2026 (expected)",
           "type": "part-time",
@@ -29,6 +29,17 @@
             "Built a CMS as a Shopify Admin app, so staff edit storefront content in the admin they already use.",
             "Set up agent-assisted development with repo rules and custom lint gates on commit, push, and CI that hold agent output to human standards.",
             "Added Storybook and Playwright end-to-end tests for cart, product, and checkout."
+          ]
+        },
+        {
+          "title": "Appraisal Desk",
+          "startDate": "June 2025",
+          "endDate": "October 2025",
+          "type": "part-time",
+          "responsibilities": [
+            "Designed and built an inspection scheduler where appraisers could view, create, and edit inspections.",
+            "Defined the testing strategy across unit, integration, and Playwright end-to-end tests.",
+            "Built GitHub Actions CI/CD pipelines that supported daily production releases."
           ]
         }
       ]
@@ -52,27 +63,6 @@
             "Updated the member chat interface for conversations with Duckbill's AI agent and added support for task-specific widgets.",
             "Introduced AI-assisted coding workflows for the frontend: verification loops, lint rules, and Playwright end-to-end tests.",
             "Built an internal documentation site covering triage, on-call, system behavior, and engineering practices, with AI workflows that kept it current as the codebase changed."
-          ]
-        }
-      ]
-    },
-    {
-      "company": "Appraisal Desk",
-      "location": "Freelance",
-      "startDate": "June 2025",
-      "endDate": "October 2025",
-      "overview": "Appraisal management platform for lenders and appraisers: order distribution, payments, compliance, and credential verification.",
-      "technologies": ["Node","NextJS", "TypeScript", "GraphQL", "PostgreSQL", "Redis", "Prisma", "Playwright", "Vitest"],
-      "positions": [
-        {
-          "title": "Freelance Software Engineer",
-          "startDate": "June 2025",
-          "endDate": "October 2025",
-          "type": "part-time",
-          "responsibilities": [
-            "Designed and built an inspection scheduler where appraisers could view, create, and edit inspections.",
-            "Defined the testing strategy across unit, integration, and Playwright end-to-end tests.",
-            "Built GitHub Actions CI/CD pipelines that supported daily production releases."
           ]
         }
       ]
