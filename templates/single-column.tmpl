@@ -83,10 +83,12 @@
 \newcommand{\resumeExperienceMinimumSpace}{10\baselineskip}
 \newcommand{\resumeRoleMinimumSpace}{5\baselineskip}
 
-\newcommand{\resumeItem}[1]{
-    \item\small{
-        {#1 \vspace{-2pt}}
-    }
+% \unskip drops trailing spaces from the item text. Without it, a bullet that
+% fills the line exactly wraps a stray space after \vspace onto a blank line.
+\newcommand{\resumeItem}[1]{%
+    \item\small{%
+        {#1\unskip\vspace{-2pt}}%
+    }%
 }
 % Just in case someone needs a heading that does not need to be in a list
 \newcommand{\resumeHeading}[3]{
@@ -254,6 +256,8 @@
 {{ range $visibleProjects -}}
     \resumeProjectHeading
     {\textbf{ {{- .Name}}} $|$ \emph{ {{- join .Technology ", "}}}}{
+    {{- if .Website }} \href{ {{- .Website}}}{\underline{Website}}{{ end -}}
+    {{- if and .Website .Github }} $|${{ end -}}
     {{- if .Github }} \href{ {{- .Github}}}{\underline{GitHub}}{{ end -}}
     }
     %\small{ { {{- .Description}} \vspace{2pt}}}

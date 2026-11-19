@@ -279,6 +279,73 @@ func TestSingleColumnTemplateProjectGitHubLinkVisibility(t *testing.T) {
 	}
 }
 
+func TestSingleColumnTemplateProjectWebsiteLink(t *testing.T) {
+	tests := []struct {
+		name          string
+		website       string
+		github        string
+		wantWebsite   bool
+		wantSeparator bool
+	}{
+		{name: "website only", website: "https://example.com", wantWebsite: true},
+		{name: "website and github", website: "https://example.com", github: "https://github.com/test/project", wantWebsite: true, wantSeparator: true},
+		{name: "no website", github: "https://github.com/test/project"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resume := &PersonalDetail{
+				Name: "Test Person",
+				Projects: []Project{
+					{
+						Name:       "Test Project",
+						Website:    tt.website,
+						Github:     tt.github,
+						Technology: []string{"Go"},
+					},
+				},
+			}
+			cfg := &config.Config{
+				AccentColor: "1f79c7",
+				MutedColor:  "5a5a5a",
+			}
+
+			got, err := GenerateLaTeX("single-column", funcMap, Data{
+				Resume: resume,
+				Config: cfg,
+			})
+			if err != nil {
+				t.Fatalf("expected template to render, got error: %v", err)
+			}
+
+			hasWebsite := strings.Contains(got, `\href{https://example.com}{\underline{Website}}`)
+			if hasWebsite != tt.wantWebsite {
+				t.Errorf("project website link presence = %t, want %t", hasWebsite, tt.wantWebsite)
+			}
+			hasSeparator := strings.Contains(got, `{\underline{Website}} $|$ \href`)
+			if hasSeparator != tt.wantSeparator {
+				t.Errorf("website/github separator presence = %t, want %t", hasSeparator, tt.wantSeparator)
+			}
+		})
+	}
+}
+
+func TestSingleColumnTemplateResumeItemTrimsTrailingSpace(t *testing.T) {
+	cfg := &config.Config{AccentColor: "1f79c7", MutedColor: "5a5a5a"}
+	got, err := GenerateLaTeX("single-column", funcMap, Data{
+		Resume: &PersonalDetail{Name: "Test Person"},
+		Config: cfg,
+	})
+	if err != nil {
+		t.Fatalf("expected template to render, got error: %v", err)
+	}
+	// A trailing space before \vspace inside \resumeItem produces a blank line
+	// when a bullet exactly fills the line width.
+	if !strings.Contains(got, `{#1\unskip\vspace{-2pt}}%`) {
+		t.Errorf("expected \\resumeItem to unskip trailing space before \\vspace")
+	}
+}
+
 func TestSingleColumnTemplateOmitsProjectsSectionWhenAllProjectsAreHidden(t *testing.T) {
 	resume := &PersonalDetail{
 		Name: "Test Person",

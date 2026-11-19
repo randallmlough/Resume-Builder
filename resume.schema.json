@@ -156,7 +156,7 @@
             "format": "uri",
             "description": "GitHub repository URL"
           },
-          "website": {
+          "url": {
             "type": "string",
             "format": "uri",
             "description": "Project website URL"

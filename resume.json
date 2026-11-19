@@ -8,8 +8,31 @@
     "github": "github.com/randallmlough",
     "website": "https://www.randyLough.com"
   },
-  "summary": "Senior full-stack product engineer comfortable moving between stacks to solve the problem in front of me. I enjoy work that starts without a clear path and calls for investigation and careful tradeoffs. My current interest is in AI, both in the products I build and in how engineering teams work with it. I use it to move faster and smarter while understanding it's limitations.",
+  "summary": "Senior full-stack product engineer comfortable moving between stacks to solve the problem in front of me. I enjoy work that starts without a clear path and calls for investigation and careful tradeoffs. My current interest is in AI, both in the products I build and in how engineering teams work with it. I use it to move faster and smarter.",
   "experience": [
+    {
+      "company": "Torrey Pines Golf Course",
+      "location": "Freelance",
+      "startDate": "October 2026",
+      "endDate": "Present",
+      "overview": "A world renowned golf course in San Diego, California.",
+      "technologies": ["React", "React Router", "Shopify Hydrogen", "Typescript", "Storybook", "Playwright", "GraphQL", "Cloudflare Workers"],
+      "website": "https://www.torrey.randylough.dev",
+      "positions": [
+        {
+          "title": "Freelance Software Engineer",
+          "startDate": "October 2026",
+          "endDate": "December 2026 (expected)",
+          "type": "part-time",
+          "responsibilities": [
+            "Rebuilt the storefront on Shopify Hydrogen, covering catalog, search, cart, customer accounts, and checkout.",
+            "Built a Shopify Admin app that works as a CMS, letting staff edit storefront content from the Shopify admin.",
+            "Set up agent-assisted development with repo rules and custom lint gates on commit, push, and CI that hold agent output to human standards.",
+            "Added Storybook for component development and Playwright end-to-end tests for cart, product, and checkout flows."
+          ]
+        }
+      ]
+    },
     {
       "company": "Duckbill",
       "location": "Remote",
@@ -36,7 +59,7 @@
     },
     {
       "company": "Appraisal Desk",
-      "location": "Remote",
+      "location": "Freelance",
       "startDate": "June 2025",
       "endDate": "October 2025",
       "overview": "An appraisal management platform for lenders and appraisers. It covers order distribution, payments, compliance, and credential verification.",
@@ -142,7 +165,8 @@
       "name": "Just Plain Coffee",
       "description": "An ecommerce app that sells coffee beans and merch using React and Shopify.",
       "technologies": ["React", "Shopify Hydrogen", "Typescript", "Storybook", "GraphQL"],
-      "url": "https://justplaincoffee.com",
+      "github": "https://github.com/randallmlough/just-plain-coffee",
+      "hide": false,
       "items": [
         "A headless Shopify storefront with Hydrogen, React 19, React Router 7, TypeScript, and Vite, covering catalog, search, cart, customer accounts, orders, and subscriptions.",
         "Built type-safe Shopify Storefront and Customer Account API integrations using GraphQL code generation and structured domain modules.",
@@ -156,10 +180,10 @@
       "technologies": ["Swift", "SwiftUI", "SwiftData", "CloudKit", "Maestro"],
       "url": "https://getcamelot.app",
       "items": [
-        "Built a SwiftUI app for iOS 26 that tracks feeding, sleep, diapers, and daily check-ins, with SwiftData storage on the device. Times are stored in UTC and shown in the child's time zone.",
-        "Built private sharing on CloudKit. Each child gets its own record zone, shared through a zone-wide CKShare with invite-only, read-write access. Caregivers' private check-ins and preferences stay in a separate zone and are never shared.",
-        "Wrote a sync layer on CKSyncEngine with separate engines for the private and shared databases. Conflicts resolve last-writer-wins on updatedAt, deletes are tombstones, and model work runs on a background ModelActor.",
-        "Added a sleep Live Activity that starts and updates on other caregivers' Lock Screens through a Cloudflare Worker push relay. Added Maestro end-to-end tests, a CloudKit schema check on pull requests, and TestFlight builds from version tags."
+        "Built a SwiftUI iOS 26 app for tracking feeding, sleep, diapers, and daily check-ins, with SwiftData storage. Times are stored in UTC and shown in the child's time zone.",
+        "Built private sharing on CloudKit with a zone-wide CKShare per child and invite-only access. Caregivers' private check-ins stay in a separate zone and are never shared.",
+        "Wrote a CKSyncEngine sync layer for private and shared databases, with last-writer-wins conflicts, delete tombstones, and model work on a background ModelActor.",
+        "Added a sleep Live Activity pushed to other caregivers' Lock Screens through a Cloudflare Worker relay. Added Maestro end-to-end tests and TestFlight builds from version tags."
       ]
     },
     {
@@ -167,6 +191,7 @@
       "description": "A collaborative, multi-tenant iOS app that works offline.",
       "technologies": ["React Native", "React Native Storybook","Postgres", "Docker", "Hono"],
       "github": "https://github.com/randallmlough/dont-forget",
+      "hide": true,
       "items": [
         "Built the app as a full-stack TypeScript monorepo with an Expo/React Native iOS client, a Hono API, a TanStack web app, shared Zod contracts, and Drizzle/Postgres storage.",
         "Used PowerSync and OP-SQLite for offline list and item updates, reactive queries, and background sync. Added tombstones and last-writer-wins conflict handling.",
@@ -373,41 +398,6 @@
       "level": "advanced",
       "years": "4 years",
       "category": "CI/CD, Infra, Monitoring"
-    },
-    {
-      "name": "AI-Assisted Development",
-      "level": "Advanced",
-      "years": "4 years",
-      "category": "AI and Developer Productivity",
-      "keywords": ["OpenAI Codex", "Claude Code", "CoPilot","PI", "OpenCode"]
-    },
-    {
-      "name": "Multi-Agent Development Workflows",
-      "level": "Advanced",
-      "years": "2 years",
-      "category": "AI and Developer Productivity",
-      "keywords": ["Planner/Implementer/Reviewer Patterns", "Task Decomposition", "Agent Handoffs", "Review Loops"]
-    },
-    {
-      "name": "AI Workflow Orchestration",
-      "level": "Advanced",
-      "years": "2 years",
-      "category": "AI and Developer Productivity",
-      "keywords": ["Human-in-the-Loop Flows", "GitHub Automation", "n8n", "Codex CLI"]
-    },
-    {
-      "name": "Prompt and Task Design",
-      "level": "Advanced",
-      "years": "4 years",
-      "category": "AI and Developer Productivity",
-      "keywords": ["PRDs", "Acceptance Criteria", "Context Engineering", "Evaluation"]
-    },
-    {
-      "name": "AI Tool Integrations",
-      "level": "Advanced",
-      "years": "2 years",
-      "category": "AI and Developer Productivity",
-      "keywords": ["Figma Workflows", "Marketing Workflows", "Analytics Workflows", "Cross-Tool Agents"]
     }
   ]
 }
