@@ -31,3 +31,6 @@ resume.tex
 # temporarly ignoring claude notes
 CLAUDE.md
 data/
+
+# Local planning artifacts
+/docs/.local/
