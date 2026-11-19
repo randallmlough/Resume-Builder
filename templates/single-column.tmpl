@@ -223,7 +223,7 @@
         location={ {{- $experience.Location}}},
     {{ end -}}
     {{ if and (not $.Config.Experience.HideDate) (ne $experience.StartDate "") -}}
-        dates={ {{- $experience.StartDate}} — {{- $experience.EndDate}}},
+        dates={ {{- $experience.StartDate}} – {{$experience.EndDate}}},
     {{ end -}}
     {{ if and (not $.Config.Experience.HideOverview) (ne $experience.Overview "") -}}
         overview={ {{- latexEscape $experience.Overview}}},
@@ -231,7 +231,7 @@
     ]
     {{ range $index, $position := $experience.Positions -}}
         \resumeSubSubheading
-            { {{- $position.Title}}}{ {{- $position.StartDate}} — {{- $position.EndDate}}}
+            { {{- $position.Title}}}{ {{- $position.StartDate}} – {{$position.EndDate}}}
             \resumeItemListStart
             {{- range $position.Responsibilities }}
                 \resumeItem{ {{- latexEscape .}} }
@@ -289,7 +289,7 @@
 \resumeSubHeadingListStart
 {{- range $visibleEducation}}
     \resumeSubheadingLocation
-    { {{- .Institution}}{{if ne .College ""}}, {{.College}}{{end}}}{ {{- .StartDate}} — {{.EndDate}}}
+    { {{- .Institution}}{{if ne .College ""}}, {{.College}}{{end}}}{ {{- .StartDate}} – {{.EndDate}}}
     { {{- .Degree}}{{if ne .GPA ""}}; GPA: {{.GPA}}{{end}}}
 {{ end -}}
 \resumeSubHeadingListEnd

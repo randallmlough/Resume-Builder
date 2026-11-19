@@ -8,15 +8,15 @@
     "github": "github.com/randallmlough",
     "website": "https://www.randyLough.com"
   },
-  "summary": "Senior full-stack product engineer comfortable moving between stacks to solve the problem in front of me. I enjoy work that starts without a clear path and calls for investigation and careful tradeoffs. My current interest is in AI, both in the products I build and in how engineering teams work with it. I use it to move faster and smarter.",
+  "summary": "Senior full-stack product engineer who is comfortable moving between stacks to solve the problem in front of me. I enjoy work that starts without a clear path and calls for investigation and careful tradeoffs. My current interest is in AI, both in the products I build and in how engineering teams work with it. I use it to move faster and smarter.",
   "experience": [
     {
       "company": "Torrey Pines Golf Course",
       "location": "Freelance",
       "startDate": "October 2026",
       "endDate": "Present",
-      "overview": "A world renowned golf course in San Diego, California.",
-      "technologies": ["React", "React Router", "Shopify Hydrogen", "Typescript", "Storybook", "Playwright", "GraphQL", "Cloudflare Workers"],
+      "overview": "Shopify storefront and custom Shopify Admin app.",
+      "technologies": ["React", "React Router", "Shopify Hydrogen", "TypeScript", "Storybook", "Playwright", "GraphQL", "Cloudflare Workers"],
       "website": "https://www.torrey.randylough.dev",
       "positions": [
         {
@@ -26,9 +26,9 @@
           "type": "part-time",
           "responsibilities": [
             "Rebuilt the storefront on Shopify Hydrogen, covering catalog, search, cart, customer accounts, and checkout.",
-            "Built a Shopify Admin app that works as a CMS, letting staff edit storefront content from the Shopify admin.",
+            "Built a CMS as a Shopify Admin app, so staff edit storefront content in the admin they already use.",
             "Set up agent-assisted development with repo rules and custom lint gates on commit, push, and CI that hold agent output to human standards.",
-            "Added Storybook for component development and Playwright end-to-end tests for cart, product, and checkout flows."
+            "Added Storybook and Playwright end-to-end tests for cart, product, and checkout."
           ]
         }
       ]
@@ -38,7 +38,7 @@
       "location": "Remote",
       "startDate": "October 2025",
       "endDate": "July 2026",
-      "overview": "Duckbill used software agents, backed by human operators, to handle everyday tasks for members.",
+      "overview": "Software agents, backed by human operators, handling everyday tasks for members.",
       "technologies": ["TypeScript", "React", "React Native", "Django", "Playwright"],
       "positions": [
         {
@@ -49,10 +49,9 @@
           "responsibilities": [
             "Rebuilt the signup flow across web and native apps, covering account creation, checkout, and activation.",
             "Instrumented the signup funnel so the team could find drop-off points and verify changes in conversion.",
-            "Took loosely defined product work from open questions to implementation, testing, and release.",
             "Updated the member chat interface for conversations with Duckbill's AI agent and added support for task-specific widgets.",
-            "Introduced AI-assisted coding workflows and team practices to speed up frontend work.",
-            "Built and rolled out a codebase documentation site with its own web server, covering triage, on-call, system behavior, guides, and engineering practices. Created automated AI workflows that kept the documentation current as the codebase changed."
+            "Introduced AI-assisted coding workflows for the frontend: verification loops, lint rules, and Playwright end-to-end tests.",
+            "Built an internal documentation site covering triage, on-call, system behavior, and engineering practices, with AI workflows that kept it current as the codebase changed."
           ]
         }
       ]
@@ -62,7 +61,7 @@
       "location": "Freelance",
       "startDate": "June 2025",
       "endDate": "October 2025",
-      "overview": "An appraisal management platform for lenders and appraisers. It covers order distribution, payments, compliance, and credential verification.",
+      "overview": "Appraisal management platform for lenders and appraisers: order distribution, payments, compliance, and credential verification.",
       "technologies": ["Node","NextJS", "TypeScript", "GraphQL", "PostgreSQL", "Redis", "Prisma", "Playwright", "Vitest"],
       "positions": [
         {
@@ -72,9 +71,8 @@
           "type": "part-time",
           "responsibilities": [
             "Designed and built an inspection scheduler where appraisers could view, create, and edit inspections.",
-            "Defined the organization's testing strategy across unit, integration, and end-to-end tests.",
-            "Built GitHub Actions CI/CD pipelines that supported daily production releases with near-zero rollbacks.",
-            "Added Playwright end-to-end coverage to reduce regressions and stabilize releases."
+            "Defined the testing strategy across unit, integration, and Playwright end-to-end tests.",
+            "Built GitHub Actions CI/CD pipelines that supported daily production releases."
           ]
         }
       ]
@@ -82,7 +80,7 @@
     {
       "company": "Zena",
       "location": "Remote",
-      "overview": "A fintech company that offered project-based charge cards, AI automations, and conversational tools.",
+      "overview": "Fintech company with project-based charge cards, AI automations, and conversational tools.",
       "technologies": ["NextJS", "TypeScript", "GraphQL", "PostgreSQL", "Redis", "Prisma", "Django", "HTMX", "Python"],
       "positions": [
         {
@@ -90,12 +88,10 @@
           "startDate": "July 2025",
           "endDate": "September 2025",
           "responsibilities": [
-            "Wrote technical specifications that kept project scope clear and deliveries on schedule.",
-            "Led the frontend work for a company-wide redesign. Built and documented a reusable component library, then wrote an HTMX request pattern for SPA-like navigation. Worked with design and product on the UI. The shared patterns made the interface more responsive and sped up later feature work.",
+            "Led frontend for a company-wide redesign: built a documented component library and an HTMX request pattern for SPA-like navigation, working with design and product.",
             "Planned and built Zena's AI agent chat UI from proof of concept through implementation. It became the base for every AI conversation in the product.",
-            "Became the team's HTMX point person and documented frontend patterns for use across major releases.",
-            "Replaced a static tool architecture with a dynamic system so AI agents could support a wider range of tools.",
-            "Designed an entitlements system that handled numeric limits and complex permissions in addition to on/off feature checks."
+            "Replaced a static tool architecture with a typed object structure for defining tools, so AI agents could support a wider range of them.",
+            "Designed an entitlements system covering numeric limits and permissions, not just on/off feature flags."
           ]
         },
         {
@@ -107,7 +103,7 @@
             "Added GraphQL schema validation to CI and standardized error handling.",
             "Started Zena's on-call program and refined the process before more engineers joined the rotation.",
             "Presented the team's GraphQL-versus-REST architecture options and tradeoffs.",
-            "Ran weekly engineering retrospectives focused on practical process changes."
+            "Ran weekly engineering retrospectives."
           ]
         }
       ]
@@ -115,27 +111,17 @@
     {
       "company": "Beam",
       "location": "Remote",
-      "overview": "An employee benefits platform with self-service tools and AI-assisted underwriting.",
+      "overview": "Employee benefits platform with self-service tools and AI-assisted underwriting.",
       "technologies": ["Ruby", "Ruby on Rails", "NextJS","MySQL", "Redis"],
       "positions": [
         {
           "title": "Software Engineer",
-          "startDate": "June 2021",
+          "startDate": "October 2020",
           "endDate": "March 2023",
           "responsibilities": [
-            "Led a TypeScript and Next.js frontend rewrite that cut feature development cycles by 40% and made the codebase easier to maintain.",
-            "Built an internal Go CLI with tests and a CI/CD pipeline for company-wide use.",
-            "Helped the engineering team adopt TypeScript, Next.js, and current frontend practices.",
+            "Led a TypeScript and Next.js frontend rewrite that cut feature development cycles by 40%, and helped the engineering team adopt both.",
+            "Built an internal Go CLI used company-wide for developer workflows, such as setting up services and updating dependencies, with tests and a CI/CD pipeline.",
             "Mentored junior engineers in Go and system design."
-          ]
-        },
-        {
-          "title": "Support Engineer",
-          "startDate": "October 2020",
-          "endDate": "June 2021",
-          "responsibilities": [
-            "Expanded test coverage to reduce production bugs and make future changes safer.",
-            "Improved application security and performance while simplifying the architecture."
           ]
         }
       ]
@@ -143,7 +129,7 @@
     {
       "company": "RetailOps",
       "location": "San Diego, CA",
-      "overview": "A cloud-based back-office platform that automates order, inventory, and warehouse workflows.",
+      "overview": "Cloud-based back-office platform for order, inventory, and warehouse workflows.",
       "hide": true,
       "positions": [
         {
@@ -164,13 +150,13 @@
     {
       "name": "Just Plain Coffee",
       "description": "An ecommerce app that sells coffee beans and merch using React and Shopify.",
-      "technologies": ["React", "Shopify Hydrogen", "Typescript", "Storybook", "GraphQL"],
+      "technologies": ["React", "Shopify Hydrogen", "TypeScript", "Storybook", "GraphQL"],
       "github": "https://github.com/randallmlough/just-plain-coffee",
       "hide": false,
       "items": [
-        "A headless Shopify storefront with Hydrogen, React 19, React Router 7, TypeScript, and Vite, covering catalog, search, cart, customer accounts, orders, and subscriptions.",
-        "Built type-safe Shopify Storefront and Customer Account API integrations using GraphQL code generation and structured domain modules.",
-        "Developed a component-driven UI system with Tailwind CSS, Base UI, and Storybook, including colocated stories and accessibility checks.",
+        "Built a headless Shopify storefront on Hydrogen, React Router 7, and TypeScript, with catalog, search, cart, accounts, orders, and subscriptions.",
+        "Built type-safe Storefront and Customer Account API integrations with GraphQL code generation.",
+        "Built the UI with Tailwind CSS, Base UI, and Storybook, with colocated stories and accessibility checks.",
         "Established a pnpm/Turborepo monorepo with automated formatting, type-aware linting, type checks, Git hooks, and production build validation."
       ]
     },
@@ -370,7 +356,7 @@
       "category": "Databases"
     },
     {
-      "name": "Github Actions",
+      "name": "GitHub Actions",
       "level": "advanced",
       "years": "3 years",
       "category": "CI/CD, Infra, Monitoring"
