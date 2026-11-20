@@ -112,9 +112,12 @@ export async function seedIfEmpty(db: StudioDb) {
 
   await db.insert(resumes).values({
     id: resumeId,
-    title: 'Master Resume (Imported from repo)',
+    title: 'Master Resume',
     dataJson: JSON.stringify(data),
     configJson: JSON.stringify(config),
+    isMaster: 1,
+    parentResumeId: null,
+    baseSyncedAt: now,
     createdAt: now,
     updatedAt: now,
   });

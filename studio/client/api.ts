@@ -1,10 +1,14 @@
 import type {
   AttachmentTargetType,
+  CompanyRecord,
   CoverLetterRecord,
+  JobPostingRecord,
+  JobStage,
   RecommendationLetterRecord,
   ResumeConfig,
   ResumeData,
   ResumeRecord,
+  ResumeSnapshotRecord,
 } from '@shared/schema';
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
@@ -20,6 +24,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  // ── Resumes ───────────────────────────────────────────────────────────────
   listResumes: () => request<ResumeRecord[]>('/api/resumes'),
 
   createResume: (input: { title: string; data: ResumeData; config?: ResumeConfig }) =>
@@ -35,6 +40,11 @@ export const api = {
     request<ResumeRecord>(`/api/resumes/${id}`, {
       method: 'PUT',
       body: JSON.stringify(input),
+    }),
+
+  setMasterResume: (id: string) =>
+    request<ResumeRecord>(`/api/resumes/${id}/set-master`, {
+      method: 'POST',
     }),
 
   cloneResume: (id: string, title?: string) =>
@@ -53,6 +63,105 @@ export const api = {
       method: 'POST',
     }),
 
+  // ── Companies & Job Postings ──────────────────────────────────────────────
+  listCompanies: () => request<CompanyRecord[]>('/api/companies'),
+
+  createCompany: (input: { name: string; website?: string; notes?: string }) =>
+    request<CompanyRecord>('/api/companies', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+
+  updateCompany: (id: string, input: { name?: string; website?: string; notes?: string }) =>
+    request<CompanyRecord>(`/api/companies/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(input),
+    }),
+
+  deleteCompany: (id: string) =>
+    request<{ deleted: boolean; id: string }>(`/api/companies/${id}`, {
+      method: 'DELETE',
+    }),
+
+  listJobs: (companyId?: string) =>
+    request<JobPostingRecord[]>(
+      companyId ? `/api/jobs?companyId=${encodeURIComponent(companyId)}` : '/api/jobs'
+    ),
+
+  createJob: (input: {
+    companyId?: string;
+    companyName?: string;
+    title: string;
+    stage?: JobStage;
+    url?: string;
+    location?: string;
+    compensation?: string;
+    description?: string;
+    notes?: string;
+    sourceResumeId?: string;
+    sourceCoverLetterId?: string;
+  }) =>
+    request<{
+      job: JobPostingRecord;
+      company: CompanyRecord;
+      resume: ResumeRecord;
+      coverLetter: CoverLetterRecord;
+    }>('/api/jobs', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+
+  updateJob: (
+    id: string,
+    input: {
+      companyId?: string;
+      title?: string;
+      stage?: JobStage;
+      url?: string;
+      location?: string;
+      compensation?: string;
+      description?: string;
+      notes?: string;
+      appliedAt?: string | null;
+    }
+  ) =>
+    request<JobPostingRecord>(`/api/jobs/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(input),
+    }),
+
+  deleteJob: (id: string) =>
+    request<{ deleted: boolean; id: string }>(`/api/jobs/${id}`, {
+      method: 'DELETE',
+    }),
+
+  syncJobFromMaster: (jobId: string, preserveCustomSummary = true) =>
+    request<ResumeRecord>(`/api/jobs/${jobId}/sync-master`, {
+      method: 'POST',
+      body: JSON.stringify({ preserveCustomSummary }),
+    }),
+
+  listSnapshots: (jobId: string) =>
+    request<ResumeSnapshotRecord[]>(`/api/jobs/${jobId}/snapshots`),
+
+  createSnapshot: (jobId: string, label: string) =>
+    request<ResumeSnapshotRecord>(`/api/jobs/${jobId}/snapshots`, {
+      method: 'POST',
+      body: JSON.stringify({ label }),
+    }),
+
+  restoreSnapshot: (jobId: string, snapshotId: string) =>
+    request<{ resume: ResumeRecord; coverLetter: CoverLetterRecord | null }>(
+      `/api/jobs/${jobId}/snapshots/${snapshotId}/restore`,
+      { method: 'POST' }
+    ),
+
+  deleteSnapshot: (jobId: string, snapshotId: string) =>
+    request<{ deleted: boolean; id: string }>(`/api/jobs/${jobId}/snapshots/${snapshotId}`, {
+      method: 'DELETE',
+    }),
+
+  // ── Cover Letters ─────────────────────────────────────────────────────────
   listCoverLetters: (resumeId?: string) =>
     request<CoverLetterRecord[]>(
       resumeId ? `/api/cover-letters?resumeId=${encodeURIComponent(resumeId)}` : '/api/cover-letters'

@@ -21,6 +21,7 @@ import {
   Type,
   Undo2,
   Unlink,
+  Upload,
 } from 'lucide-react';
 import type { CoverLetterRecord } from '@shared/schema';
 import { markdownToHtml, tiptapJsonToMarkdown, type RichNode } from '@shared/coverLetterFormat';
@@ -31,6 +32,7 @@ interface CoverLetterEditorProps {
   onSelect: (id: string) => void;
   onCreate: () => void;
   onDelete: (id: string) => void;
+  onUploadFile?: (title: string, markdown: string) => void;
   onChange: (patch: Partial<Pick<CoverLetterRecord, 'title' | 'company' | 'bodyMarkdown'>>) => void;
 }
 
@@ -78,8 +80,10 @@ export function CoverLetterEditor({
   onSelect,
   onCreate,
   onDelete,
+  onUploadFile,
   onChange,
 }: CoverLetterEditorProps) {
+  const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const [sourceMode, setSourceMode] = useState<'wysiwyg' | 'markdown'>('wysiwyg');
   const [linkBarOpen, setLinkBarOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
@@ -197,6 +201,32 @@ export function CoverLetterEditor({
             <Plus className="w-3.5 h-3.5" />
             New
           </button>
+          {onUploadFile && (
+            <>
+              <input
+                ref={uploadInputRef}
+                type="file"
+                accept=".md,.markdown,.txt,text/markdown,text/plain"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const title = file.name.replace(/\.(md|markdown|txt)$/i, '').replace(/[_-]+/g, ' ');
+                  file.text().then((text) => onUploadFile(title || 'Uploaded Cover Letter', text));
+                  e.target.value = '';
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => uploadInputRef.current?.click()}
+                title="Upload a .md or .txt cover letter file"
+                className="h-8 px-2.5 inline-flex items-center gap-1 text-xs font-medium rounded-md bg-white text-stone-700 hover:bg-stone-100 border border-stone-200"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                Upload
+              </button>
+            </>
+          )}
           {activeLetter && letters.length > 1 && (
             <button
               type="button"

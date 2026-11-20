@@ -10,29 +10,45 @@ import { PDFDocument } from 'pdf-lib';
 import {
   ALLOWED_RECOMMENDATION_MIMES,
   AttachmentTargetTypeSchema,
+  CreateCompanyInputSchema,
   CreateCoverLetterInputSchema,
+  CreateJobPostingInputSchema,
   CreateResumeInputSchema,
+  CreateSnapshotInputSchema,
   DEFAULT_CONFIG,
+  JobStageSchema,
   ResumeConfigSchema,
   ResumeDataSchema,
   SetAttachmentsInputSchema,
+  UpdateCompanyInputSchema,
   UpdateCoverLetterInputSchema,
+  UpdateJobPostingInputSchema,
   UpdateRecommendationInputSchema,
   UpdateResumeInputSchema,
   type AttachmentTargetType,
+  type CompanyRecord,
   type CoverLetterRecord,
+  type JobPostingRecord,
   type RecommendationLetterRecord,
   type ResumeRecord,
+  type ResumeSnapshotRecord,
 } from '../shared/schema.js';
+import { pullUpdatesFromMaster } from '../shared/resumeDiff.js';
 import type { StudioDb } from './db/index.js';
 import {
+  companies,
   coverLetters,
   documentAttachments,
+  jobPostings,
   recommendationLetters,
   resumes,
+  resumeSnapshots,
+  type CompanyRow,
   type CoverLetterRow,
+  type JobPostingRow,
   type RecommendationLetterRow,
   type ResumeRow,
+  type ResumeSnapshotRow,
 } from './db/schema.js';
 import { loadRepoResumeAndConfig } from './seed.js';
 
@@ -62,6 +78,9 @@ function toResumeRecord(row: ResumeRow): ResumeRecord {
     title: row.title,
     data: ResumeDataSchema.parse(JSON.parse(row.dataJson)),
     config: ResumeConfigSchema.parse(JSON.parse(row.configJson)),
+    isMaster: Boolean(row.isMaster),
+    parentResumeId: row.parentResumeId ?? null,
+    baseSyncedAt: row.baseSyncedAt ?? null,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -74,6 +93,17 @@ function toCoverLetterRecord(row: CoverLetterRow): CoverLetterRecord {
     title: row.title,
     company: row.company,
     bodyMarkdown: row.bodyMarkdown,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+function toCompanyRecord(row: CompanyRow): CompanyRecord {
+  return {
+    id: row.id,
+    name: row.name,
+    website: row.website,
+    notes: row.notes,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -95,13 +125,32 @@ function toRecommendationRecord(row: RecommendationLetterRow): RecommendationLet
   };
 }
 
+function toSnapshotRecord(row: ResumeSnapshotRow): ResumeSnapshotRecord {
+  let attachedIds: string[] = [];
+  try {
+    const parsed = JSON.parse(row.attachedLetterIdsJson);
+    if (Array.isArray(parsed)) attachedIds = parsed.map(String);
+  } catch {
+    attachedIds = [];
+  }
+  return {
+    id: row.id,
+    jobPostingId: row.jobPostingId,
+    label: row.label,
+    data: ResumeDataSchema.parse(JSON.parse(row.dataJson)),
+    config: ResumeConfigSchema.parse(JSON.parse(row.configJson)),
+    coverLetterMarkdown: row.coverLetterMarkdown,
+    attachedLetterIds: attachedIds,
+    createdAt: row.createdAt,
+  };
+}
+
 export interface CreateAppOptions {
   uploadsDir?: string;
 }
 
 export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
-  const uploadsDir =
-    options.uploadsDir ?? path.resolve(__dirname, '../data/uploads');
+  const uploadsDir = options.uploadsDir ?? path.resolve(__dirname, '../data/uploads');
   fs.mkdirSync(uploadsDir, { recursive: true });
 
   const app = new Hono();
@@ -140,9 +189,62 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
     return ordered;
   }
 
+  async function enrichJobPostings(rows: JobPostingRow[]): Promise<JobPostingRecord[]> {
+    const [allCompanies, allSnapshots, allAttachments] = await Promise.all([
+      db.select().from(companies),
+      db.select().from(resumeSnapshots),
+      db.select().from(documentAttachments),
+    ]);
+
+    const companyMap = new Map(allCompanies.map((c) => [c.id, c.name]));
+
+    const snapCountByJob = new Map<string, number>();
+    for (const s of allSnapshots) {
+      snapCountByJob.set(s.jobPostingId, (snapCountByJob.get(s.jobPostingId) ?? 0) + 1);
+    }
+
+    const attCountByTarget = new Map<string, number>();
+    for (const a of allAttachments) {
+      const key = `${a.targetType}:${a.targetId}`;
+      attCountByTarget.set(key, (attCountByTarget.get(key) ?? 0) + 1);
+    }
+
+    return rows.map((row) => ({
+      id: row.id,
+      companyId: row.companyId,
+      companyName: companyMap.get(row.companyId) ?? 'Unknown Company',
+      title: row.title,
+      stage: JobStageSchema.catch('tailoring').parse(row.stage),
+      url: row.url,
+      location: row.location,
+      compensation: row.compensation,
+      description: row.description,
+      notes: row.notes,
+      appliedAt: row.appliedAt ?? null,
+      resumeId: row.resumeId,
+      coverLetterId: row.coverLetterId ?? null,
+      snapshotCount: snapCountByJob.get(row.id) ?? 0,
+      attachmentCount:
+        (attCountByTarget.get(`resume:${row.resumeId}`) ?? 0) +
+        (row.coverLetterId ? (attCountByTarget.get(`cover_letter:${row.coverLetterId}`) ?? 0) : 0),
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    }));
+  }
+
+  async function findMasterResumeRow(): Promise<ResumeRow | undefined> {
+    const [master] = await db.select().from(resumes).where(eq(resumes.isMaster, 1));
+    if (master) return master;
+    const all = await db.select().from(resumes).orderBy(asc(resumes.createdAt));
+    return all[0];
+  }
+
   // ── Resumes CRUD ──────────────────────────────────────────────────────────
   app.get('/api/resumes', async (c) => {
-    const rows = await db.select().from(resumes).orderBy(desc(resumes.updatedAt));
+    const rows = await db
+      .select()
+      .from(resumes)
+      .orderBy(desc(resumes.isMaster), desc(resumes.updatedAt));
     return c.json(rows.map(toResumeRecord));
   });
 
@@ -169,6 +271,9 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
       title: parsed.data.title,
       dataJson: JSON.stringify(parsed.data.data),
       configJson: JSON.stringify(config),
+      isMaster: 0,
+      parentResumeId: null,
+      baseSyncedAt: null,
       createdAt: now,
       updatedAt: now,
     });
@@ -203,6 +308,21 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
     return c.json(toResumeRecord(updated));
   });
 
+  app.post('/api/resumes/:id/set-master', async (c) => {
+    const id = c.req.param('id');
+    const [existing] = await db.select().from(resumes).where(eq(resumes.id, id));
+    if (!existing) return c.json({ error: 'Resume not found' }, 404);
+
+    await db.update(resumes).set({ isMaster: 0 });
+    await db
+      .update(resumes)
+      .set({ isMaster: 1, parentResumeId: null, updatedAt: new Date().toISOString() })
+      .where(eq(resumes.id, id));
+
+    const [updated] = await db.select().from(resumes).where(eq(resumes.id, id));
+    return c.json(toResumeRecord(updated));
+  });
+
   app.post('/api/resumes/:id/clone', async (c) => {
     const id = c.req.param('id');
     const [existing] = await db.select().from(resumes).where(eq(resumes.id, id));
@@ -225,19 +345,18 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
       title: customTitle ?? `${existing.title} (Copy)`,
       dataJson: existing.dataJson,
       configJson: existing.configJson,
+      isMaster: 0,
+      parentResumeId: existing.id,
+      baseSyncedAt: existing.updatedAt,
       createdAt: now,
       updatedAt: now,
     });
 
-    // Copy any attached recommendation letters to the cloned resume
     const existingLinks = await db
       .select()
       .from(documentAttachments)
       .where(
-        and(
-          eq(documentAttachments.targetType, 'resume'),
-          eq(documentAttachments.targetId, id)
-        )
+        and(eq(documentAttachments.targetType, 'resume'), eq(documentAttachments.targetId, id))
       )
       .orderBy(asc(documentAttachments.position));
 
@@ -261,7 +380,6 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
     const [existing] = await db.select().from(resumes).where(eq(resumes.id, id));
     if (!existing) return c.json({ error: 'Resume not found' }, 404);
 
-    // Clean up attachment rows for this resume and any cascaded cover letters
     const childLetters = await db
       .select()
       .from(coverLetters)
@@ -279,10 +397,7 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
     await db
       .delete(documentAttachments)
       .where(
-        and(
-          eq(documentAttachments.targetType, 'resume'),
-          eq(documentAttachments.targetId, id)
-        )
+        and(eq(documentAttachments.targetType, 'resume'), eq(documentAttachments.targetId, id))
       );
 
     await db.delete(resumes).where(eq(resumes.id, id));
@@ -300,12 +415,545 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
       title: `Repo Import (${stamp})`,
       dataJson: JSON.stringify(data),
       configJson: JSON.stringify(config),
+      isMaster: 0,
+      parentResumeId: null,
+      baseSyncedAt: null,
       createdAt: now,
       updatedAt: now,
     });
 
     const [created] = await db.select().from(resumes).where(eq(resumes.id, id));
     return c.json(toResumeRecord(created), 201);
+  });
+
+  // ── Companies CRUD ────────────────────────────────────────────────────────
+  app.get('/api/companies', async (c) => {
+    const rows = await db.select().from(companies).orderBy(asc(companies.name));
+    return c.json(rows.map(toCompanyRecord));
+  });
+
+  app.post('/api/companies', async (c) => {
+    const body = await c.req.json();
+    const parsed = CreateCompanyInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: 'Validation failed', details: parsed.error.flatten() }, 400);
+    }
+
+    const now = new Date().toISOString();
+    const id = crypto.randomUUID();
+    await db.insert(companies).values({
+      id,
+      name: parsed.data.name.trim(),
+      website: parsed.data.website.trim(),
+      notes: parsed.data.notes,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const [created] = await db.select().from(companies).where(eq(companies.id, id));
+    return c.json(toCompanyRecord(created), 201);
+  });
+
+  app.put('/api/companies/:id', async (c) => {
+    const id = c.req.param('id');
+    const [existing] = await db.select().from(companies).where(eq(companies.id, id));
+    if (!existing) return c.json({ error: 'Company not found' }, 404);
+
+    const body = await c.req.json();
+    const parsed = UpdateCompanyInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: 'Validation failed', details: parsed.error.flatten() }, 400);
+    }
+
+    const now = new Date().toISOString();
+    await db
+      .update(companies)
+      .set({
+        name: parsed.data.name?.trim() ?? existing.name,
+        website: parsed.data.website?.trim() ?? existing.website,
+        notes: parsed.data.notes ?? existing.notes,
+        updatedAt: now,
+      })
+      .where(eq(companies.id, id));
+
+    const [updated] = await db.select().from(companies).where(eq(companies.id, id));
+    return c.json(toCompanyRecord(updated));
+  });
+
+  app.delete('/api/companies/:id', async (c) => {
+    const id = c.req.param('id');
+    const [existing] = await db.select().from(companies).where(eq(companies.id, id));
+    if (!existing) return c.json({ error: 'Company not found' }, 404);
+
+    // Clean up all role resumes, cover letters, and attachments owned by this company's postings
+    const postings = await db.select().from(jobPostings).where(eq(jobPostings.companyId, id));
+    for (const p of postings) {
+      if (p.coverLetterId) {
+        await db
+          .delete(documentAttachments)
+          .where(
+            and(
+              eq(documentAttachments.targetType, 'cover_letter'),
+              eq(documentAttachments.targetId, p.coverLetterId)
+            )
+          );
+      }
+      await db
+        .delete(documentAttachments)
+        .where(
+          and(
+            eq(documentAttachments.targetType, 'resume'),
+            eq(documentAttachments.targetId, p.resumeId)
+          )
+        );
+      const [roleResume] = await db.select().from(resumes).where(eq(resumes.id, p.resumeId));
+      if (roleResume && !roleResume.isMaster) {
+        await db.delete(resumes).where(eq(resumes.id, p.resumeId));
+      }
+    }
+
+    await db.delete(companies).where(eq(companies.id, id));
+    return c.json({ deleted: true, id });
+  });
+
+  // ── Job Postings CRUD (multiple roles per company!) ───────────────────────
+  app.get('/api/jobs', async (c) => {
+    const companyId = c.req.query('companyId');
+    const rows = companyId
+      ? await db
+          .select()
+          .from(jobPostings)
+          .where(eq(jobPostings.companyId, companyId))
+          .orderBy(desc(jobPostings.updatedAt))
+      : await db.select().from(jobPostings).orderBy(desc(jobPostings.updatedAt));
+
+    return c.json(await enrichJobPostings(rows));
+  });
+
+  app.post('/api/jobs', async (c) => {
+    const body = await c.req.json();
+    const parsed = CreateJobPostingInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: 'Validation failed', details: parsed.error.flatten() }, 400);
+    }
+
+    const now = new Date().toISOString();
+
+    // Resolve or create Company
+    let companyId = parsed.data.companyId;
+    let companyName = parsed.data.companyName?.trim() ?? '';
+
+    if (companyId) {
+      const [comp] = await db.select().from(companies).where(eq(companies.id, companyId));
+      if (!comp) return c.json({ error: 'Company not found' }, 404);
+      companyName = comp.name;
+    } else if (companyName) {
+      // Reuse existing company if case-insensitive match exists, otherwise create new
+      const allCompanies = await db.select().from(companies);
+      const existingComp = allCompanies.find(
+        (comp) => comp.name.toLowerCase() === companyName.toLowerCase()
+      );
+      if (existingComp) {
+        companyId = existingComp.id;
+        companyName = existingComp.name;
+      } else {
+        companyId = crypto.randomUUID();
+        await db.insert(companies).values({
+          id: companyId,
+          name: companyName,
+          website: '',
+          notes: '',
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+    } else {
+      return c.json({ error: 'Either companyId or companyName is required' }, 400);
+    }
+
+    // Fork Master (or specified sourceResumeId) into a dedicated role resume
+    let sourceResume: ResumeRow | undefined;
+    if (parsed.data.sourceResumeId) {
+      const [src] = await db
+        .select()
+        .from(resumes)
+        .where(eq(resumes.id, parsed.data.sourceResumeId));
+      sourceResume = src;
+    }
+    if (!sourceResume) {
+      sourceResume = await findMasterResumeRow();
+    }
+    if (!sourceResume) {
+      return c.json({ error: 'No Master resume available to fork from' }, 400);
+    }
+
+    const roleResumeId = crypto.randomUUID();
+    const roleTitle = parsed.data.title.trim();
+    await db.insert(resumes).values({
+      id: roleResumeId,
+      title: `${companyName} — ${roleTitle}`,
+      dataJson: sourceResume.dataJson,
+      configJson: sourceResume.configJson,
+      isMaster: 0,
+      parentResumeId: sourceResume.id,
+      baseSyncedAt: sourceResume.updatedAt,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Copy any default attachments from the source resume
+    const srcAttachments = await db
+      .select()
+      .from(documentAttachments)
+      .where(
+        and(
+          eq(documentAttachments.targetType, 'resume'),
+          eq(documentAttachments.targetId, sourceResume.id)
+        )
+      )
+      .orderBy(asc(documentAttachments.position));
+    for (const att of srcAttachments) {
+      await db.insert(documentAttachments).values({
+        id: crypto.randomUUID(),
+        targetType: 'resume',
+        targetId: roleResumeId,
+        letterId: att.letterId,
+        position: att.position,
+        createdAt: now,
+      });
+    }
+
+    // Create a dedicated Cover Letter linked to this role's resume
+    const sourceResumeData = ResumeDataSchema.parse(JSON.parse(sourceResume.dataJson));
+    const coverLetterId = crypto.randomUUID();
+
+    let templateBody = `Dear ${companyName} Hiring Team,\n\nI am excited to apply for the **${roleTitle}** role at **${companyName}**.\n\nBest regards,\n\n${sourceResumeData.name || 'Your Name'}`;
+    let sourceCoverRow: CoverLetterRow | undefined;
+
+    if (parsed.data.sourceCoverLetterId) {
+      const [cl] = await db
+        .select()
+        .from(coverLetters)
+        .where(eq(coverLetters.id, parsed.data.sourceCoverLetterId));
+      sourceCoverRow = cl;
+    } else {
+      // Default to the most recent global cover letter on the source/Master resume if available
+      const globalLetters = await db
+        .select()
+        .from(coverLetters)
+        .where(eq(coverLetters.resumeId, sourceResume.id))
+        .orderBy(desc(coverLetters.updatedAt));
+      sourceCoverRow = globalLetters[0];
+    }
+
+    if (sourceCoverRow && sourceCoverRow.bodyMarkdown.trim()) {
+      templateBody = sourceCoverRow.bodyMarkdown
+        .replace(/\{\{\s*company\s*\}\}/gi, companyName)
+        .replace(/\{\{\s*role\s*\}\}/gi, roleTitle);
+    }
+
+    await db.insert(coverLetters).values({
+      id: coverLetterId,
+      resumeId: roleResumeId,
+      title: `${companyName} — ${roleTitle}`,
+      company: companyName,
+      bodyMarkdown: templateBody,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Copy any default attachments from the chosen global cover letter
+    if (sourceCoverRow) {
+      const srcClAttachments = await db
+        .select()
+        .from(documentAttachments)
+        .where(
+          and(
+            eq(documentAttachments.targetType, 'cover_letter'),
+            eq(documentAttachments.targetId, sourceCoverRow.id)
+          )
+        )
+        .orderBy(asc(documentAttachments.position));
+      for (const att of srcClAttachments) {
+        await db.insert(documentAttachments).values({
+          id: crypto.randomUUID(),
+          targetType: 'cover_letter',
+          targetId: coverLetterId,
+          letterId: att.letterId,
+          position: att.position,
+          createdAt: now,
+        });
+      }
+    }
+
+    const jobId = crypto.randomUUID();
+    const appliedAt = parsed.data.stage === 'applied' ? now : null;
+    await db.insert(jobPostings).values({
+      id: jobId,
+      companyId,
+      title: roleTitle,
+      stage: parsed.data.stage,
+      url: parsed.data.url.trim(),
+      location: parsed.data.location.trim(),
+      compensation: parsed.data.compensation.trim(),
+      description: parsed.data.description,
+      notes: parsed.data.notes,
+      appliedAt,
+      resumeId: roleResumeId,
+      coverLetterId,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const [createdJob] = await db.select().from(jobPostings).where(eq(jobPostings.id, jobId));
+    const [enrichedJob] = await enrichJobPostings([createdJob]);
+    const [createdResume] = await db.select().from(resumes).where(eq(resumes.id, roleResumeId));
+    const [createdCover] = await db
+      .select()
+      .from(coverLetters)
+      .where(eq(coverLetters.id, coverLetterId));
+    const [companyRow] = await db.select().from(companies).where(eq(companies.id, companyId));
+
+    return c.json(
+      {
+        job: enrichedJob,
+        company: toCompanyRecord(companyRow),
+        resume: toResumeRecord(createdResume),
+        coverLetter: toCoverLetterRecord(createdCover),
+      },
+      201
+    );
+  });
+
+  app.put('/api/jobs/:id', async (c) => {
+    const id = c.req.param('id');
+    const [existing] = await db.select().from(jobPostings).where(eq(jobPostings.id, id));
+    if (!existing) return c.json({ error: 'Job posting not found' }, 404);
+
+    const body = await c.req.json();
+    const parsed = UpdateJobPostingInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: 'Validation failed', details: parsed.error.flatten() }, 400);
+    }
+
+    const now = new Date().toISOString();
+    const nextStage = parsed.data.stage ?? existing.stage;
+    let nextAppliedAt =
+      parsed.data.appliedAt !== undefined ? parsed.data.appliedAt : existing.appliedAt;
+    if (nextStage === 'applied' && !nextAppliedAt) {
+      nextAppliedAt = now;
+    }
+
+    await db
+      .update(jobPostings)
+      .set({
+        companyId: parsed.data.companyId ?? existing.companyId,
+        title: parsed.data.title?.trim() ?? existing.title,
+        stage: nextStage,
+        url: parsed.data.url !== undefined ? parsed.data.url.trim() : existing.url,
+        location:
+          parsed.data.location !== undefined ? parsed.data.location.trim() : existing.location,
+        compensation:
+          parsed.data.compensation !== undefined
+            ? parsed.data.compensation.trim()
+            : existing.compensation,
+        description: parsed.data.description ?? existing.description,
+        notes: parsed.data.notes ?? existing.notes,
+        appliedAt: nextAppliedAt,
+        updatedAt: now,
+      })
+      .where(eq(jobPostings.id, id));
+
+    const [updated] = await db.select().from(jobPostings).where(eq(jobPostings.id, id));
+    const [enriched] = await enrichJobPostings([updated]);
+    return c.json(enriched);
+  });
+
+  app.delete('/api/jobs/:id', async (c) => {
+    const id = c.req.param('id');
+    const [existing] = await db.select().from(jobPostings).where(eq(jobPostings.id, id));
+    if (!existing) return c.json({ error: 'Job posting not found' }, 404);
+
+    if (existing.coverLetterId) {
+      await db
+        .delete(documentAttachments)
+        .where(
+          and(
+            eq(documentAttachments.targetType, 'cover_letter'),
+            eq(documentAttachments.targetId, existing.coverLetterId)
+          )
+        );
+    }
+    await db
+      .delete(documentAttachments)
+      .where(
+        and(
+          eq(documentAttachments.targetType, 'resume'),
+          eq(documentAttachments.targetId, existing.resumeId)
+        )
+      );
+
+    await db.delete(jobPostings).where(eq(jobPostings.id, id));
+
+    // Delete the role-specific resume (cascades its cover letter too), guarding Master
+    const [roleResume] = await db.select().from(resumes).where(eq(resumes.id, existing.resumeId));
+    if (roleResume && !roleResume.isMaster) {
+      await db.delete(resumes).where(eq(resumes.id, existing.resumeId));
+    }
+
+    return c.json({ deleted: true, id });
+  });
+
+  // Pull latest Master Resume updates into a Job Posting's tailored resume
+  app.post('/api/jobs/:id/sync-master', async (c) => {
+    const id = c.req.param('id');
+    const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, id));
+    if (!job) return c.json({ error: 'Job posting not found' }, 404);
+
+    const masterRow = await findMasterResumeRow();
+    const [roleResumeRow] = await db.select().from(resumes).where(eq(resumes.id, job.resumeId));
+    if (!masterRow || !roleResumeRow) {
+      return c.json({ error: 'Resume records not found' }, 404);
+    }
+
+    let preserveCustomSummary = true;
+    try {
+      const body = await c.req.json();
+      if (typeof body?.preserveCustomSummary === 'boolean') {
+        preserveCustomSummary = body.preserveCustomSummary;
+      }
+    } catch {
+      // default true
+    }
+
+    const masterData = ResumeDataSchema.parse(JSON.parse(masterRow.dataJson));
+    const roleData = ResumeDataSchema.parse(JSON.parse(roleResumeRow.dataJson));
+    const mergedData = pullUpdatesFromMaster(masterData, roleData, preserveCustomSummary);
+
+    const now = new Date().toISOString();
+    await db
+      .update(resumes)
+      .set({
+        dataJson: JSON.stringify(mergedData),
+        parentResumeId: masterRow.id,
+        baseSyncedAt: masterRow.updatedAt,
+        updatedAt: now,
+      })
+      .where(eq(resumes.id, roleResumeRow.id));
+
+    const [updated] = await db.select().from(resumes).where(eq(resumes.id, roleResumeRow.id));
+    return c.json(toResumeRecord(updated));
+  });
+
+  // ── Frozen Submission Snapshots per Job Posting ───────────────────────────
+  app.get('/api/jobs/:id/snapshots', async (c) => {
+    const id = c.req.param('id');
+    const rows = await db
+      .select()
+      .from(resumeSnapshots)
+      .where(eq(resumeSnapshots.jobPostingId, id))
+      .orderBy(desc(resumeSnapshots.createdAt));
+    return c.json(rows.map(toSnapshotRecord));
+  });
+
+  app.post('/api/jobs/:id/snapshots', async (c) => {
+    const id = c.req.param('id');
+    const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, id));
+    if (!job) return c.json({ error: 'Job posting not found' }, 404);
+
+    const body = await c.req.json();
+    const parsed = CreateSnapshotInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: 'Validation failed', details: parsed.error.flatten() }, 400);
+    }
+
+    const [roleResume] = await db.select().from(resumes).where(eq(resumes.id, job.resumeId));
+    if (!roleResume) return c.json({ error: 'Role resume not found' }, 404);
+
+    let coverMarkdown = '';
+    if (job.coverLetterId) {
+      const [cl] = await db
+        .select()
+        .from(coverLetters)
+        .where(eq(coverLetters.id, job.coverLetterId));
+      if (cl) coverMarkdown = cl.bodyMarkdown;
+    }
+
+    const attached = await listAttachedLetters('resume', job.resumeId);
+    const snapId = crypto.randomUUID();
+    const now = new Date().toISOString();
+
+    await db.insert(resumeSnapshots).values({
+      id: snapId,
+      jobPostingId: id,
+      label: parsed.data.label.trim(),
+      dataJson: roleResume.dataJson,
+      configJson: roleResume.configJson,
+      coverLetterMarkdown: coverMarkdown,
+      attachedLetterIdsJson: JSON.stringify(attached.map((a) => a.id)),
+      createdAt: now,
+    });
+
+    const [created] = await db
+      .select()
+      .from(resumeSnapshots)
+      .where(eq(resumeSnapshots.id, snapId));
+    return c.json(toSnapshotRecord(created), 201);
+  });
+
+  app.post('/api/jobs/:id/snapshots/:snapshotId/restore', async (c) => {
+    const jobId = c.req.param('id');
+    const snapshotId = c.req.param('snapshotId');
+
+    const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, jobId));
+    if (!job) return c.json({ error: 'Job posting not found' }, 404);
+
+    const [snap] = await db
+      .select()
+      .from(resumeSnapshots)
+      .where(and(eq(resumeSnapshots.id, snapshotId), eq(resumeSnapshots.jobPostingId, jobId)));
+    if (!snap) return c.json({ error: 'Snapshot not found' }, 404);
+
+    const now = new Date().toISOString();
+    await db
+      .update(resumes)
+      .set({
+        dataJson: snap.dataJson,
+        configJson: snap.configJson,
+        updatedAt: now,
+      })
+      .where(eq(resumes.id, job.resumeId));
+
+    let restoredCover: CoverLetterRecord | null = null;
+    if (job.coverLetterId) {
+      await db
+        .update(coverLetters)
+        .set({
+          bodyMarkdown: snap.coverLetterMarkdown,
+          updatedAt: now,
+        })
+        .where(eq(coverLetters.id, job.coverLetterId));
+      const [cl] = await db
+        .select()
+        .from(coverLetters)
+        .where(eq(coverLetters.id, job.coverLetterId));
+      if (cl) restoredCover = toCoverLetterRecord(cl);
+    }
+
+    const [restoredResume] = await db.select().from(resumes).where(eq(resumes.id, job.resumeId));
+    return c.json({
+      resume: toResumeRecord(restoredResume),
+      coverLetter: restoredCover,
+    });
+  });
+
+  app.delete('/api/jobs/:id/snapshots/:snapshotId', async (c) => {
+    const jobId = c.req.param('id');
+    const snapshotId = c.req.param('snapshotId');
+    await db
+      .delete(resumeSnapshots)
+      .where(and(eq(resumeSnapshots.id, snapshotId), eq(resumeSnapshots.jobPostingId, jobId)));
+    return c.json({ deleted: true, id: snapshotId });
   });
 
   // ── Cover Letters CRUD ────────────────────────────────────────────────────
@@ -564,10 +1212,7 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
       return c.json({ error: 'Validation failed', details: parsed.error.flatten() }, 400);
     }
 
-    // Deduplicate while preserving user's chosen order
     const uniqueIds = Array.from(new Set(parsed.data.letterIds));
-
-    // Verify each letter exists
     const existingLetters = await db.select().from(recommendationLetters);
     const validSet = new Set(existingLetters.map((l) => l.id));
     const filteredIds = uniqueIds.filter((id) => validSet.has(id));

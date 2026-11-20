@@ -164,12 +164,73 @@ export const SetAttachmentsInputSchema = z.object({
   letterIds: z.array(z.string().min(1)),
 });
 
+export const JobStageSchema = z.enum([
+  'saved',
+  'tailoring',
+  'applied',
+  'interviewing',
+  'offer',
+  'archived',
+]);
+
+export const JOB_STAGES = [
+  { id: 'saved', label: 'Saved' },
+  { id: 'tailoring', label: 'Tailoring' },
+  { id: 'applied', label: 'Applied' },
+  { id: 'interviewing', label: 'Interviewing' },
+  { id: 'offer', label: 'Offer' },
+  { id: 'archived', label: 'Archived' },
+] as const;
+
+export const CreateCompanyInputSchema = z.object({
+  name: z.string().min(1).max(200),
+  website: z.string().max(500).optional().default(''),
+  notes: z.string().optional().default(''),
+});
+
+export const UpdateCompanyInputSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  website: z.string().max(500).optional(),
+  notes: z.string().optional(),
+});
+
+export const CreateJobPostingInputSchema = z.object({
+  companyId: z.string().min(1).optional(),
+  companyName: z.string().min(1).max(200).optional(),
+  title: z.string().min(1).max(200),
+  stage: JobStageSchema.optional().default('tailoring'),
+  url: z.string().max(1000).optional().default(''),
+  location: z.string().max(200).optional().default(''),
+  compensation: z.string().max(200).optional().default(''),
+  description: z.string().optional().default(''),
+  notes: z.string().optional().default(''),
+  sourceResumeId: z.string().min(1).optional(),
+  sourceCoverLetterId: z.string().min(1).optional(),
+});
+
+export const UpdateJobPostingInputSchema = z.object({
+  companyId: z.string().min(1).optional(),
+  title: z.string().min(1).max(200).optional(),
+  stage: JobStageSchema.optional(),
+  url: z.string().max(1000).optional(),
+  location: z.string().max(200).optional(),
+  compensation: z.string().max(200).optional(),
+  description: z.string().optional(),
+  notes: z.string().optional(),
+  appliedAt: z.string().nullable().optional(),
+});
+
+export const CreateSnapshotInputSchema = z.object({
+  label: z.string().min(1).max(200),
+});
+
 export const ALLOWED_RECOMMENDATION_MIMES = [
   'application/pdf',
   'image/png',
   'image/jpeg',
 ] as const;
 
+export type JobStage = z.infer<typeof JobStageSchema>;
 export type AttachmentTargetType = z.infer<typeof AttachmentTargetTypeSchema>;
 export type Contact = z.infer<typeof ContactSchema>;
 export type Position = z.infer<typeof PositionSchema>;
@@ -185,8 +246,51 @@ export interface ResumeRecord {
   title: string;
   data: ResumeData;
   config: ResumeConfig;
+  isMaster: boolean;
+  parentResumeId: string | null;
+  baseSyncedAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CompanyRecord {
+  id: string;
+  name: string;
+  website: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface JobPostingRecord {
+  id: string;
+  companyId: string;
+  companyName: string;
+  title: string;
+  stage: JobStage;
+  url: string;
+  location: string;
+  compensation: string;
+  description: string;
+  notes: string;
+  appliedAt: string | null;
+  resumeId: string;
+  coverLetterId: string | null;
+  snapshotCount: number;
+  attachmentCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ResumeSnapshotRecord {
+  id: string;
+  jobPostingId: string;
+  label: string;
+  data: ResumeData;
+  config: ResumeConfig;
+  coverLetterMarkdown: string;
+  attachedLetterIds: string[];
+  createdAt: string;
 }
 
 export interface CoverLetterRecord {
