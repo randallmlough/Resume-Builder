@@ -22,7 +22,9 @@ import {
   JOB_STAGES,
   ResumeDataSchema,
   type AttachmentTargetType,
+  type CompanyContactRecord,
   type CompanyRecord,
+  type ContactRelationship,
   type CoverLetterRecord,
   type JobPostingRecord,
   type JobStage,
@@ -31,14 +33,17 @@ import {
   type ResumeData,
   type ResumeRecord,
   type ResumeSnapshotRecord,
+  type RoleContactRecord,
 } from '@shared/schema';
 import { api } from './api';
 import { useTypst } from './typst/useTypst';
 import { mergePdfWithAttachments } from './pdf/mergePdf';
 import { WorkspaceSidebar, type WorkspaceView } from './components/WorkspaceSidebar';
 import { ProfileSettingsPage } from './components/ProfileSettingsPage';
+import { CompanyPage } from './components/CompanyPage';
 import { KanbanBoard } from './components/KanbanBoard';
 import { JobDetailsPanel } from './components/JobDetailsPanel';
+import type { ContactDraft } from './components/ContactFormCard';
 import { NewJobModal } from './components/NewJobModal';
 import { VisualEditor } from './components/VisualEditor';
 import { JsonEditor } from './components/JsonEditor';
@@ -55,6 +60,9 @@ export function App() {
   const [view, setView] = useState<WorkspaceView>('profile');
 
   const [companies, setCompanies] = useState<CompanyRecord[]>([]);
+  const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
+  const [contacts, setContacts] = useState<CompanyContactRecord[]>([]);
+  const [roleContacts, setRoleContacts] = useState<RoleContactRecord[]>([]);
   const [jobs, setJobs] = useState<JobPostingRecord[]>([]);
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
 
@@ -88,10 +96,16 @@ export function App() {
   const saveTimerRef = useRef<number | null>(null);
   const letterSaveTimerRef = useRef<number | null>(null);
   const jobSaveTimerRef = useRef<number | null>(null);
+  const companySaveTimerRef = useRef<number | null>(null);
 
   const masterResume = useMemo(
     () => resumes.find((r) => r.isMaster) ?? resumes[0] ?? null,
     [resumes]
+  );
+
+  const activeCompany = useMemo(
+    () => (view === 'company' ? companies.find((c) => c.id === activeCompanyId) ?? null : null),
+    [view, companies, activeCompanyId]
   );
 
   const activeJob = useMemo(
@@ -148,14 +162,21 @@ export function App() {
     let cancelled = false;
     (async () => {
       try {
-        const [loadedResumes, loadedLetters, loadedRecs, loadedCompanies, loadedJobs] =
-          await Promise.all([
-            api.listResumes(),
-            api.listCoverLetters(),
-            api.listRecommendations(),
-            api.listCompanies(),
-            api.listJobs(),
-          ]);
+        const [
+          loadedResumes,
+          loadedLetters,
+          loadedRecs,
+          loadedCompanies,
+          loadedJobs,
+          loadedContacts,
+        ] = await Promise.all([
+          api.listResumes(),
+          api.listCoverLetters(),
+          api.listRecommendations(),
+          api.listCompanies(),
+          api.listJobs(),
+          api.listContacts(),
+        ]);
         if (cancelled) return;
         setResumes(loadedResumes);
         setLetters(loadedLetters);
@@ -163,6 +184,7 @@ export function App() {
         setRecommendations(loadedRecs);
         setCompanies(loadedCompanies);
         setJobs(loadedJobs);
+        setContacts(loadedContacts);
       } catch (err) {
         if (!cancelled) {
           setLoadError(err instanceof Error ? err.message : 'Failed to connect to studio API');
@@ -216,20 +238,26 @@ export function App() {
     };
   }, [activeLetter?.id]);
 
-  // Load snapshots when viewing a role posting
+  // Load snapshots & linked role contacts when viewing a role posting
   useEffect(() => {
     if (!activeJob?.id) {
       setSnapshots([]);
+      setRoleContacts([]);
       return;
     }
     let cancelled = false;
-    api
-      .listSnapshots(activeJob.id)
-      .then((rows) => {
-        if (!cancelled) setSnapshots(rows);
+    Promise.all([api.listSnapshots(activeJob.id), api.listJobContacts(activeJob.id)])
+      .then(([snaps, linkedContacts]) => {
+        if (!cancelled) {
+          setSnapshots(snaps);
+          setRoleContacts(linkedContacts);
+        }
       })
       .catch(() => {
-        if (!cancelled) setSnapshots([]);
+        if (!cancelled) {
+          setSnapshots([]);
+          setRoleContacts([]);
+        }
       });
     return () => {
       cancelled = true;
@@ -364,9 +392,110 @@ export function App() {
   const handleSelectJob = (jobId: string) => {
     setActiveJobId(jobId);
     setView('role');
-    if (resumeTab === 'details') {
-      // keep current tab
+  };
+
+  const handleSelectCompany = (companyId: string) => {
+    setActiveCompanyId(companyId);
+    setView('company');
+  };
+
+  const handleUpdateCompany = (
+    companyId: string,
+    patch: Partial<Pick<CompanyRecord, 'name' | 'website' | 'notes'>>
+  ) => {
+    setCompanies((prev) => prev.map((c) => (c.id === companyId ? { ...c, ...patch } : c)));
+    if (patch.name) {
+      setJobs((prev) =>
+        prev.map((j) => (j.companyId === companyId ? { ...j, companyName: patch.name! } : j))
+      );
     }
+    setSaveStatus('dirty');
+    if (companySaveTimerRef.current) window.clearTimeout(companySaveTimerRef.current);
+    companySaveTimerRef.current = window.setTimeout(async () => {
+      setSaveStatus('saving');
+      try {
+        const updated = await api.updateCompany(companyId, patch);
+        setCompanies((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+        setSaveStatus('saved');
+      } catch {
+        setSaveStatus('error');
+      }
+    }, 400);
+  };
+
+  // Contact CRUD & Role Contact Linking
+  const handleCreateCompanyContact = async (companyId: string, draft: ContactDraft) => {
+    const created = await api.createContact({
+      companyId,
+      name: draft.name,
+      title: draft.title,
+      email: draft.email,
+      phone: draft.phone,
+      linkedin: draft.linkedin,
+      github: draft.github,
+      twitter: draft.twitter,
+      website: draft.website,
+      notes: draft.notes,
+    });
+    setContacts((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+    return created;
+  };
+
+  const handleUpdateContact = async (contactId: string, draft: ContactDraft) => {
+    const updated = await api.updateContact(contactId, {
+      name: draft.name,
+      title: draft.title,
+      email: draft.email,
+      phone: draft.phone,
+      linkedin: draft.linkedin,
+      github: draft.github,
+      twitter: draft.twitter,
+      website: draft.website,
+      notes: draft.notes,
+    });
+    setContacts((prev) =>
+      prev.map((c) => (c.id === updated.id ? updated : c)).sort((a, b) => a.name.localeCompare(b.name))
+    );
+    setRoleContacts((prev) =>
+      prev.map((rc) => (rc.id === updated.id ? { ...updated, relationship: rc.relationship } : rc))
+    );
+  };
+
+  const handleDeleteContact = async (contactId: string) => {
+    await api.deleteContact(contactId);
+    setContacts((prev) => prev.filter((c) => c.id !== contactId));
+    setRoleContacts((prev) => prev.filter((rc) => rc.id !== contactId));
+    // Refresh jobs to keep contactCount accurate across all roles
+    const refreshedJobs = await api.listJobs();
+    setJobs(refreshedJobs);
+  };
+
+  const handleLinkJobContact = async (
+    jobId: string,
+    contactId: string,
+    relationship: ContactRelationship
+  ) => {
+    const updated = await api.linkJobContact(jobId, contactId, relationship);
+    setRoleContacts(updated);
+    setJobs((prev) =>
+      prev.map((j) => (j.id === jobId ? { ...j, contactCount: updated.length } : j))
+    );
+  };
+
+  const handleUnlinkJobContact = async (jobId: string, contactId: string) => {
+    const updated = await api.unlinkJobContact(jobId, contactId);
+    setRoleContacts(updated);
+    setJobs((prev) =>
+      prev.map((j) => (j.id === jobId ? { ...j, contactCount: updated.length } : j))
+    );
+  };
+
+  const handleCreateAndLinkRoleContact = async (
+    job: JobPostingRecord,
+    draft: ContactDraft
+  ) => {
+    const created = await handleCreateCompanyContact(job.companyId, draft);
+    await handleLinkJobContact(job.id, created.id, draft.relationship ?? 'hiring_manager');
   };
 
   const handleUpdateJob = (
@@ -426,11 +555,13 @@ export function App() {
       removedJobs.map((j) => j.coverLetterId).filter(Boolean) as string[]
     );
     setCompanies((prev) => prev.filter((c) => c.id !== company.id));
+    setContacts((prev) => prev.filter((c) => c.companyId !== company.id));
     setJobs((prev) => prev.filter((j) => j.companyId !== company.id));
     setResumes((prev) => prev.filter((r) => !removedResumeIds.has(r.id) || r.isMaster));
     setLetters((prev) => prev.filter((l) => !removedCoverIds.has(l.id)));
-    if (activeJob && activeJob.companyId === company.id) {
+    if ((activeJob && activeJob.companyId === company.id) || activeCompanyId === company.id) {
       setActiveJobId(null);
+      setActiveCompanyId(null);
       setView('kanban');
     }
   };
@@ -699,6 +830,7 @@ export function App() {
         jobs={jobs}
         resumes={resumes}
         masterResume={masterResume}
+        activeCompanyId={activeCompanyId}
         activeJobId={activeJobId}
         onToggleCollapse={() => setSidebarCollapsed((c) => !c)}
         onSelectProfile={() => setView('profile')}
@@ -707,6 +839,7 @@ export function App() {
           setView('master');
           if (resumeTab === 'details') setResumeTab('visual');
         }}
+        onSelectCompany={handleSelectCompany}
         onSelectJob={handleSelectJob}
         onOpenNewJobModal={handleOpenNewJobModal}
         onDeleteCompany={handleDeleteCompany}
@@ -756,6 +889,21 @@ export function App() {
           onSeedFromRepo={handleSeedFromRepo}
           onImportJson={handleImportJson}
           onExportJson={handleExportJson}
+        />
+      ) : view === 'company' && activeCompany ? (
+        <CompanyPage
+          company={activeCompany}
+          jobs={jobs.filter((j) => j.companyId === activeCompany.id)}
+          contacts={contacts.filter((c) => c.companyId === activeCompany.id)}
+          onUpdateCompany={(patch) => handleUpdateCompany(activeCompany.id, patch)}
+          onDeleteCompany={() => void handleDeleteCompany(activeCompany)}
+          onSelectJob={handleSelectJob}
+          onAddRole={() => handleOpenNewJobModal(activeCompany.id)}
+          onCreateContact={async (draft) => {
+            await handleCreateCompanyContact(activeCompany.id, draft);
+          }}
+          onUpdateContact={handleUpdateContact}
+          onDeleteContact={handleDeleteContact}
         />
       ) : view === 'kanban' ? (
         <KanbanBoard
@@ -1058,6 +1206,10 @@ export function App() {
                         roleResume={activeResume}
                         masterResume={masterResume}
                         snapshots={snapshots}
+                        companyContacts={contacts.filter(
+                          (c) => c.companyId === activeJob.companyId
+                        )}
+                        roleContacts={roleContacts}
                         syncingMaster={syncingMaster}
                         onUpdateJob={(patch) => handleUpdateJob(activeJob.id, patch)}
                         onDeleteJob={() => void handleDeleteJob(activeJob)}
@@ -1065,6 +1217,17 @@ export function App() {
                         onCreateSnapshot={handleCreateSnapshot}
                         onRestoreSnapshot={handleRestoreSnapshot}
                         onDeleteSnapshot={handleDeleteSnapshot}
+                        onCreateAndLinkContact={(draft) =>
+                          handleCreateAndLinkRoleContact(activeJob, draft)
+                        }
+                        onUpdateContact={handleUpdateContact}
+                        onLinkContact={(contactId, rel) =>
+                          handleLinkJobContact(activeJob.id, contactId, rel)
+                        }
+                        onUnlinkContact={(contactId) =>
+                          handleUnlinkJobContact(activeJob.id, contactId)
+                        }
+                        onOpenCompanyPage={() => handleSelectCompany(activeJob.companyId)}
                       />
                     )}
                     {activeResume && effectiveResumeTab === 'visual' && (

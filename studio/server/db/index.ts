@@ -114,12 +114,41 @@ export function createDatabase(dbPath: string) {
       created_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS contacts (
+      id TEXT PRIMARY KEY NOT NULL,
+      company_id TEXT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      title TEXT NOT NULL DEFAULT '',
+      email TEXT NOT NULL DEFAULT '',
+      phone TEXT NOT NULL DEFAULT '',
+      linkedin TEXT NOT NULL DEFAULT '',
+      github TEXT NOT NULL DEFAULT '',
+      twitter TEXT NOT NULL DEFAULT '',
+      website TEXT NOT NULL DEFAULT '',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS job_posting_contacts (
+      id TEXT PRIMARY KEY NOT NULL,
+      job_posting_id TEXT NOT NULL REFERENCES job_postings(id) ON DELETE CASCADE,
+      contact_id TEXT NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+      relationship TEXT NOT NULL DEFAULT 'hiring_manager',
+      created_at TEXT NOT NULL,
+      UNIQUE(job_posting_id, contact_id)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_document_attachments_target
       ON document_attachments(target_type, target_id, position);
     CREATE INDEX IF NOT EXISTS idx_job_postings_company
       ON job_postings(company_id);
     CREATE INDEX IF NOT EXISTS idx_resume_snapshots_job
       ON resume_snapshots(job_posting_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_contacts_company
+      ON contacts(company_id);
+    CREATE INDEX IF NOT EXISTS idx_job_posting_contacts_job
+      ON job_posting_contacts(job_posting_id);
   `);
 
   // Safe additive migration for pre-existing studio.db files

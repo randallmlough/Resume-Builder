@@ -1,6 +1,8 @@
 import type {
   AttachmentTargetType,
+  CompanyContactRecord,
   CompanyRecord,
+  ContactRelationship,
   CoverLetterRecord,
   JobPostingRecord,
   JobStage,
@@ -9,6 +11,7 @@ import type {
   ResumeData,
   ResumeRecord,
   ResumeSnapshotRecord,
+  RoleContactRecord,
 } from '@shared/schema';
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
@@ -158,6 +161,67 @@ export const api = {
 
   deleteSnapshot: (jobId: string, snapshotId: string) =>
     request<{ deleted: boolean; id: string }>(`/api/jobs/${jobId}/snapshots/${snapshotId}`, {
+      method: 'DELETE',
+    }),
+
+  // ── Contacts & Role Contacts ──────────────────────────────────────────────
+  listContacts: (companyId?: string) =>
+    request<CompanyContactRecord[]>(
+      companyId ? `/api/contacts?companyId=${encodeURIComponent(companyId)}` : '/api/contacts'
+    ),
+
+  createContact: (input: {
+    companyId: string;
+    name: string;
+    title?: string;
+    email?: string;
+    phone?: string;
+    linkedin?: string;
+    github?: string;
+    twitter?: string;
+    website?: string;
+    notes?: string;
+  }) =>
+    request<CompanyContactRecord>('/api/contacts', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+
+  updateContact: (
+    id: string,
+    input: {
+      name?: string;
+      title?: string;
+      email?: string;
+      phone?: string;
+      linkedin?: string;
+      github?: string;
+      twitter?: string;
+      website?: string;
+      notes?: string;
+    }
+  ) =>
+    request<CompanyContactRecord>(`/api/contacts/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(input),
+    }),
+
+  deleteContact: (id: string) =>
+    request<{ deleted: boolean; id: string }>(`/api/contacts/${id}`, {
+      method: 'DELETE',
+    }),
+
+  listJobContacts: (jobId: string) =>
+    request<RoleContactRecord[]>(`/api/jobs/${jobId}/contacts`),
+
+  linkJobContact: (jobId: string, contactId: string, relationship: ContactRelationship) =>
+    request<RoleContactRecord[]>(`/api/jobs/${jobId}/contacts`, {
+      method: 'POST',
+      body: JSON.stringify({ contactId, relationship }),
+    }),
+
+  unlinkJobContact: (jobId: string, contactId: string) =>
+    request<RoleContactRecord[]>(`/api/jobs/${jobId}/contacts/${contactId}`, {
       method: 'DELETE',
     }),
 

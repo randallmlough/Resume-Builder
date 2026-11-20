@@ -10,40 +10,49 @@ import { PDFDocument } from 'pdf-lib';
 import {
   ALLOWED_RECOMMENDATION_MIMES,
   AttachmentTargetTypeSchema,
+  ContactRelationshipSchema,
   CreateCompanyInputSchema,
+  CreateContactInputSchema,
   CreateCoverLetterInputSchema,
   CreateJobPostingInputSchema,
   CreateResumeInputSchema,
   CreateSnapshotInputSchema,
   DEFAULT_CONFIG,
   JobStageSchema,
+  LinkJobContactInputSchema,
   ResumeConfigSchema,
   ResumeDataSchema,
   SetAttachmentsInputSchema,
   UpdateCompanyInputSchema,
+  UpdateContactInputSchema,
   UpdateCoverLetterInputSchema,
   UpdateJobPostingInputSchema,
   UpdateRecommendationInputSchema,
   UpdateResumeInputSchema,
   type AttachmentTargetType,
+  type CompanyContactRecord,
   type CompanyRecord,
   type CoverLetterRecord,
   type JobPostingRecord,
   type RecommendationLetterRecord,
   type ResumeRecord,
   type ResumeSnapshotRecord,
+  type RoleContactRecord,
 } from '../shared/schema.js';
 import { pullUpdatesFromMaster } from '../shared/resumeDiff.js';
 import type { StudioDb } from './db/index.js';
 import {
   companies,
+  contacts,
   coverLetters,
   documentAttachments,
+  jobPostingContacts,
   jobPostings,
   recommendationLetters,
   resumes,
   resumeSnapshots,
   type CompanyRow,
+  type ContactRow,
   type CoverLetterRow,
   type JobPostingRow,
   type RecommendationLetterRow,
@@ -102,6 +111,24 @@ function toCompanyRecord(row: CompanyRow): CompanyRecord {
   return {
     id: row.id,
     name: row.name,
+    website: row.website,
+    notes: row.notes,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+function toContactRecord(row: ContactRow): CompanyContactRecord {
+  return {
+    id: row.id,
+    companyId: row.companyId,
+    name: row.name,
+    title: row.title,
+    email: row.email,
+    phone: row.phone,
+    linkedin: row.linkedin,
+    github: row.github,
+    twitter: row.twitter,
     website: row.website,
     notes: row.notes,
     createdAt: row.createdAt,
@@ -190,10 +217,11 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
   }
 
   async function enrichJobPostings(rows: JobPostingRow[]): Promise<JobPostingRecord[]> {
-    const [allCompanies, allSnapshots, allAttachments] = await Promise.all([
+    const [allCompanies, allSnapshots, allAttachments, allJobContacts] = await Promise.all([
       db.select().from(companies),
       db.select().from(resumeSnapshots),
       db.select().from(documentAttachments),
+      db.select().from(jobPostingContacts),
     ]);
 
     const companyMap = new Map(allCompanies.map((c) => [c.id, c.name]));
@@ -207,6 +235,11 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
     for (const a of allAttachments) {
       const key = `${a.targetType}:${a.targetId}`;
       attCountByTarget.set(key, (attCountByTarget.get(key) ?? 0) + 1);
+    }
+
+    const contactCountByJob = new Map<string, number>();
+    for (const jc of allJobContacts) {
+      contactCountByJob.set(jc.jobPostingId, (contactCountByJob.get(jc.jobPostingId) ?? 0) + 1);
     }
 
     return rows.map((row) => ({
@@ -227,9 +260,35 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
       attachmentCount:
         (attCountByTarget.get(`resume:${row.resumeId}`) ?? 0) +
         (row.coverLetterId ? (attCountByTarget.get(`cover_letter:${row.coverLetterId}`) ?? 0) : 0),
+      contactCount: contactCountByJob.get(row.id) ?? 0,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     }));
+  }
+
+  async function listJobContacts(jobPostingId: string): Promise<RoleContactRecord[]> {
+    const links = await db
+      .select()
+      .from(jobPostingContacts)
+      .where(eq(jobPostingContacts.jobPostingId, jobPostingId))
+      .orderBy(asc(jobPostingContacts.createdAt));
+
+    if (links.length === 0) return [];
+
+    const allContacts = await db.select().from(contacts);
+    const byId = new Map(allContacts.map((c) => [c.id, c]));
+
+    const result: RoleContactRecord[] = [];
+    for (const link of links) {
+      const row = byId.get(link.contactId);
+      if (row) {
+        result.push({
+          ...toContactRecord(row),
+          relationship: ContactRelationshipSchema.catch('other').parse(link.relationship),
+        });
+      }
+    }
+    return result;
   }
 
   async function findMasterResumeRow(): Promise<ResumeRow | undefined> {
@@ -514,6 +573,161 @@ export function createApp(db: StudioDb, options: CreateAppOptions = {}) {
 
     await db.delete(companies).where(eq(companies.id, id));
     return c.json({ deleted: true, id });
+  });
+
+  // ── Company Contacts CRUD ─────────────────────────────────────────────────
+  app.get('/api/contacts', async (c) => {
+    const companyId = c.req.query('companyId');
+    const rows = companyId
+      ? await db
+          .select()
+          .from(contacts)
+          .where(eq(contacts.companyId, companyId))
+          .orderBy(asc(contacts.name))
+      : await db.select().from(contacts).orderBy(asc(contacts.name));
+    return c.json(rows.map(toContactRecord));
+  });
+
+  app.post('/api/contacts', async (c) => {
+    const body = await c.req.json();
+    const parsed = CreateContactInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: 'Validation failed', details: parsed.error.flatten() }, 400);
+    }
+
+    const [comp] = await db
+      .select()
+      .from(companies)
+      .where(eq(companies.id, parsed.data.companyId));
+    if (!comp) return c.json({ error: 'Company not found' }, 404);
+
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    await db.insert(contacts).values({
+      id,
+      companyId: parsed.data.companyId,
+      name: parsed.data.name.trim(),
+      title: parsed.data.title.trim(),
+      email: parsed.data.email.trim(),
+      phone: parsed.data.phone.trim(),
+      linkedin: parsed.data.linkedin.trim(),
+      github: parsed.data.github.trim(),
+      twitter: parsed.data.twitter.trim(),
+      website: parsed.data.website.trim(),
+      notes: parsed.data.notes,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const [created] = await db.select().from(contacts).where(eq(contacts.id, id));
+    return c.json(toContactRecord(created), 201);
+  });
+
+  app.put('/api/contacts/:id', async (c) => {
+    const id = c.req.param('id');
+    const [existing] = await db.select().from(contacts).where(eq(contacts.id, id));
+    if (!existing) return c.json({ error: 'Contact not found' }, 404);
+
+    const body = await c.req.json();
+    const parsed = UpdateContactInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: 'Validation failed', details: parsed.error.flatten() }, 400);
+    }
+
+    const now = new Date().toISOString();
+    await db
+      .update(contacts)
+      .set({
+        name: parsed.data.name?.trim() ?? existing.name,
+        title: parsed.data.title !== undefined ? parsed.data.title.trim() : existing.title,
+        email: parsed.data.email !== undefined ? parsed.data.email.trim() : existing.email,
+        phone: parsed.data.phone !== undefined ? parsed.data.phone.trim() : existing.phone,
+        linkedin:
+          parsed.data.linkedin !== undefined ? parsed.data.linkedin.trim() : existing.linkedin,
+        github: parsed.data.github !== undefined ? parsed.data.github.trim() : existing.github,
+        twitter: parsed.data.twitter !== undefined ? parsed.data.twitter.trim() : existing.twitter,
+        website: parsed.data.website !== undefined ? parsed.data.website.trim() : existing.website,
+        notes: parsed.data.notes ?? existing.notes,
+        updatedAt: now,
+      })
+      .where(eq(contacts.id, id));
+
+    const [updated] = await db.select().from(contacts).where(eq(contacts.id, id));
+    return c.json(toContactRecord(updated));
+  });
+
+  app.delete('/api/contacts/:id', async (c) => {
+    const id = c.req.param('id');
+    const [existing] = await db.select().from(contacts).where(eq(contacts.id, id));
+    if (!existing) return c.json({ error: 'Contact not found' }, 404);
+
+    await db.delete(contacts).where(eq(contacts.id, id));
+    return c.json({ deleted: true, id });
+  });
+
+  // ── Role Contacts (Hiring Manager / Decision Maker / Recruiter per Role) ──
+  app.get('/api/jobs/:id/contacts', async (c) => {
+    const id = c.req.param('id');
+    return c.json(await listJobContacts(id));
+  });
+
+  app.post('/api/jobs/:id/contacts', async (c) => {
+    const jobId = c.req.param('id');
+    const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, jobId));
+    if (!job) return c.json({ error: 'Job posting not found' }, 404);
+
+    const body = await c.req.json();
+    const parsed = LinkJobContactInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: 'Validation failed', details: parsed.error.flatten() }, 400);
+    }
+
+    const [contact] = await db
+      .select()
+      .from(contacts)
+      .where(eq(contacts.id, parsed.data.contactId));
+    if (!contact) return c.json({ error: 'Contact not found' }, 404);
+
+    const [existingLink] = await db
+      .select()
+      .from(jobPostingContacts)
+      .where(
+        and(
+          eq(jobPostingContacts.jobPostingId, jobId),
+          eq(jobPostingContacts.contactId, parsed.data.contactId)
+        )
+      );
+
+    if (existingLink) {
+      await db
+        .update(jobPostingContacts)
+        .set({ relationship: parsed.data.relationship })
+        .where(eq(jobPostingContacts.id, existingLink.id));
+    } else {
+      await db.insert(jobPostingContacts).values({
+        id: crypto.randomUUID(),
+        jobPostingId: jobId,
+        contactId: parsed.data.contactId,
+        relationship: parsed.data.relationship,
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    return c.json(await listJobContacts(jobId), 201);
+  });
+
+  app.delete('/api/jobs/:id/contacts/:contactId', async (c) => {
+    const jobId = c.req.param('id');
+    const contactId = c.req.param('contactId');
+    await db
+      .delete(jobPostingContacts)
+      .where(
+        and(
+          eq(jobPostingContacts.jobPostingId, jobId),
+          eq(jobPostingContacts.contactId, contactId)
+        )
+      );
+    return c.json(await listJobContacts(jobId));
   });
 
   // ── Job Postings CRUD (multiple roles per company!) ───────────────────────

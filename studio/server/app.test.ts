@@ -361,4 +361,93 @@ describe('Resume Studio API (Hono + Drizzle + SQLite)', () => {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
+
+  it('manages company contacts and links hiring managers / decision makers to roles', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'studio-contacts-test-'));
+    const { db, sqlite } = createDatabase(':memory:');
+    await seedIfEmpty(db);
+    const app = createApp(db, { uploadsDir: tmpDir });
+
+    try {
+      const feBundle = await (
+        await app.request('/api/jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ companyName: 'Anthropic', title: 'Frontend Engineer' }),
+        })
+      ).json();
+      const fsBundle = await (
+        await app.request('/api/jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            companyId: feBundle.company.id,
+            title: 'Full-Stack Engineer',
+          }),
+        })
+      ).json();
+
+      // Create company contacts with role in company + social profiles
+      const c1Res = await app.request('/api/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyId: feBundle.company.id,
+          name: 'Sarah Chen',
+          title: 'VP of Engineering',
+          email: 'sarah@anthropic.com',
+          linkedin: 'linkedin.com/in/sarahchen',
+          github: 'github.com/sarahchen',
+          twitter: '@sarahchen',
+          website: 'https://sarahchen.dev',
+          notes: 'Decision maker for Product Engineering',
+        }),
+      });
+      expect(c1Res.status).toBe(201);
+      const sarah = await c1Res.json();
+      expect(sarah.title).toBe('VP of Engineering');
+      expect(sarah.twitter).toBe('@sarahchen');
+
+      // Link Sarah as Hiring Manager on Frontend role and Decision Maker on Full-Stack role
+      const linkFe = await app.request(`/api/jobs/${feBundle.job.id}/contacts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId: sarah.id, relationship: 'hiring_manager' }),
+      });
+      expect(linkFe.status).toBe(201);
+      const feContacts = await linkFe.json();
+      expect(feContacts.length).toBe(1);
+      expect(feContacts[0].relationship).toBe('hiring_manager');
+
+      const linkFs = await app.request(`/api/jobs/${fsBundle.job.id}/contacts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId: sarah.id, relationship: 'decision_maker' }),
+      });
+      expect(linkFs.status).toBe(201);
+      expect((await linkFs.json())[0].relationship).toBe('decision_maker');
+
+      // Verify job listing reflects contactCount
+      const jobsList = await (await app.request('/api/jobs')).json();
+      expect(jobsList.every((j: { contactCount: number }) => j.contactCount === 1)).toBe(true);
+
+      // Unlinking from Frontend role keeps Sarah in Anthropic's company contacts
+      const unlinkFe = await app.request(`/api/jobs/${feBundle.job.id}/contacts/${sarah.id}`, {
+        method: 'DELETE',
+      });
+      expect(unlinkFe.status).toBe(200);
+      expect(await unlinkFe.json()).toEqual([]);
+      expect(
+        (await (await app.request(`/api/contacts?companyId=${feBundle.company.id}`)).json()).length
+      ).toBe(1);
+
+      // Deleting Sarah cascades out of Full-Stack role
+      const delContact = await app.request(`/api/contacts/${sarah.id}`, { method: 'DELETE' });
+      expect(delContact.status).toBe(200);
+      expect(await (await app.request(`/api/jobs/${fsBundle.job.id}/contacts`)).json()).toEqual([]);
+    } finally {
+      sqlite.close();
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
 });

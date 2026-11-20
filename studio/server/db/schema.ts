@@ -94,6 +94,36 @@ export const documentAttachments = sqliteTable('document_attachments', {
   createdAt: text('created_at').notNull(),
 });
 
+export const contacts = sqliteTable('contacts', {
+  id: text('id').primaryKey(),
+  companyId: text('company_id')
+    .notNull()
+    .references(() => companies.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  title: text('title').notNull().default(''),
+  email: text('email').notNull().default(''),
+  phone: text('phone').notNull().default(''),
+  linkedin: text('linkedin').notNull().default(''),
+  github: text('github').notNull().default(''),
+  twitter: text('twitter').notNull().default(''),
+  website: text('website').notNull().default(''),
+  notes: text('notes').notNull().default(''),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+export const jobPostingContacts = sqliteTable('job_posting_contacts', {
+  id: text('id').primaryKey(),
+  jobPostingId: text('job_posting_id')
+    .notNull()
+    .references(() => jobPostings.id, { onDelete: 'cascade' }),
+  contactId: text('contact_id')
+    .notNull()
+    .references(() => contacts.id, { onDelete: 'cascade' }),
+  relationship: text('relationship').notNull().default('hiring_manager'),
+  createdAt: text('created_at').notNull(),
+});
+
 export type ResumeRow = typeof resumes.$inferSelect;
 export type CoverLetterRow = typeof coverLetters.$inferSelect;
 export type CompanyRow = typeof companies.$inferSelect;
@@ -101,3 +131,5 @@ export type JobPostingRow = typeof jobPostings.$inferSelect;
 export type ResumeSnapshotRow = typeof resumeSnapshots.$inferSelect;
 export type RecommendationLetterRow = typeof recommendationLetters.$inferSelect;
 export type DocumentAttachmentRow = typeof documentAttachments.$inferSelect;
+export type ContactRow = typeof contacts.$inferSelect;
+export type JobPostingContactRow = typeof jobPostingContacts.$inferSelect;

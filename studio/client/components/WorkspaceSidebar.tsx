@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Briefcase,
   Building2,
   ChevronDown,
   ChevronRight,
@@ -9,12 +8,12 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  Settings,
   Trash2,
-  UserCircle2,
 } from 'lucide-react';
 import type { CompanyRecord, JobPostingRecord, JobStage, ResumeRecord } from '@shared/schema';
 
-export type WorkspaceView = 'profile' | 'kanban' | 'master' | 'role';
+export type WorkspaceView = 'profile' | 'kanban' | 'master' | 'company' | 'role';
 
 const STAGE_DOT: Record<JobStage, string> = {
   saved: 'bg-stone-400',
@@ -32,11 +31,13 @@ interface WorkspaceSidebarProps {
   jobs: JobPostingRecord[];
   resumes: ResumeRecord[];
   masterResume: ResumeRecord | null;
+  activeCompanyId: string | null;
   activeJobId: string | null;
   onToggleCollapse: () => void;
   onSelectProfile: () => void;
   onSelectKanban: () => void;
   onSelectMaster: () => void;
+  onSelectCompany: (companyId: string) => void;
   onSelectJob: (jobId: string) => void;
   onOpenNewJobModal: (companyId?: string) => void;
   onDeleteCompany: (company: CompanyRecord) => void;
@@ -49,11 +50,13 @@ export function WorkspaceSidebar({
   jobs,
   resumes,
   masterResume,
+  activeCompanyId,
   activeJobId,
   onToggleCollapse,
   onSelectProfile,
   onSelectKanban,
   onSelectMaster,
+  onSelectCompany,
   onSelectJob,
   onOpenNewJobModal,
   onDeleteCompany,
@@ -84,18 +87,6 @@ export function WorkspaceSidebar({
         <div className="w-6 h-px bg-stone-200 my-1" />
         <button
           type="button"
-          onClick={onSelectProfile}
-          title="Profile Settings (Source of Truth)"
-          className={`w-8 h-8 rounded-md inline-flex items-center justify-center transition-colors ${
-            view === 'profile'
-              ? 'bg-sky-700 text-white'
-              : 'text-stone-600 hover:bg-stone-200/70 hover:text-stone-900'
-          }`}
-        >
-          <UserCircle2 className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
           onClick={onSelectKanban}
           title="Global Pipeline (Kanban)"
           className={`w-8 h-8 rounded-md inline-flex items-center justify-center transition-colors ${
@@ -109,7 +100,7 @@ export function WorkspaceSidebar({
         <button
           type="button"
           onClick={onSelectMaster}
-          title="Master Resume"
+          title="Master Preview"
           className={`w-8 h-8 rounded-md inline-flex items-center justify-center transition-colors ${
             view === 'master'
               ? 'bg-sky-700 text-white'
@@ -125,6 +116,18 @@ export function WorkspaceSidebar({
           className="w-8 h-8 rounded-md inline-flex items-center justify-center text-sky-700 hover:bg-sky-50"
         >
           <Plus className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onSelectProfile}
+          title="Settings"
+          className={`mt-auto w-8 h-8 rounded-md inline-flex items-center justify-center transition-colors ${
+            view === 'profile'
+              ? 'bg-sky-700 text-white'
+              : 'text-stone-600 hover:bg-stone-200/70 hover:text-stone-900'
+          }`}
+        >
+          <Settings className="w-4 h-4" />
         </button>
       </aside>
     );
@@ -159,24 +162,6 @@ export function WorkspaceSidebar({
         <div className="space-y-1">
           <button
             type="button"
-            onClick={onSelectProfile}
-            className={`w-full px-2.5 py-2 rounded-lg text-xs font-medium flex items-center justify-between gap-2 transition-colors ${
-              view === 'profile'
-                ? 'bg-white text-stone-900 shadow-2xs border border-stone-200'
-                : 'text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 border border-transparent'
-            }`}
-          >
-            <span className="inline-flex items-center gap-2 truncate">
-              <UserCircle2 className="w-3.5 h-3.5 text-sky-700 shrink-0" />
-              <span className="truncate">Profile Settings</span>
-            </span>
-            <span className="font-mono text-[10px] uppercase px-1.5 py-0.2 rounded bg-sky-50 text-sky-700 border border-sky-200/70">
-              Source
-            </span>
-          </button>
-
-          <button
-            type="button"
             onClick={onSelectKanban}
             className={`w-full px-2.5 py-2 rounded-lg text-xs font-medium flex items-center justify-between gap-2 transition-colors ${
               view === 'kanban'
@@ -185,7 +170,7 @@ export function WorkspaceSidebar({
             }`}
           >
             <span className="inline-flex items-center gap-2 truncate">
-              <Kanban className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+              <Kanban className="w-3.5 h-3.5 text-sky-700 shrink-0" />
               <span className="truncate">Global Pipeline</span>
             </span>
             <span className="font-mono text-[11px] px-1.5 py-0.2 rounded-full bg-stone-100 text-stone-600 border border-stone-200/80">
@@ -247,9 +232,17 @@ export function WorkspaceSidebar({
                 const companyJobs = jobs.filter((j) => j.companyId === company.id);
                 const isCollapsed = !!collapsedCompanies[company.id];
 
+                const isCompanyActive = view === 'company' && activeCompanyId === company.id;
+
                 return (
                   <div key={company.id} className="space-y-0.5">
-                    <div className="group flex items-center justify-between gap-1 px-1.5 py-1.5 rounded-md hover:bg-stone-200/50">
+                    <div
+                      className={`group flex items-center justify-between gap-1 px-1.5 py-1.5 rounded-md transition-colors ${
+                        isCompanyActive
+                          ? 'bg-white border border-stone-200 shadow-2xs'
+                          : 'hover:bg-stone-200/50 border border-transparent'
+                      }`}
+                    >
                       <button
                         type="button"
                         onClick={() =>
@@ -258,14 +251,27 @@ export function WorkspaceSidebar({
                             [company.id]: !prev[company.id],
                           }))
                         }
-                        className="flex items-center gap-1.5 min-w-0 flex-1 text-left"
+                        aria-label={`Toggle ${company.name} roles`}
+                        className="w-5 h-5 inline-flex items-center justify-center rounded text-stone-400 hover:text-stone-700 shrink-0"
                       >
                         {isCollapsed ? (
-                          <ChevronRight className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                          <ChevronRight className="w-3.5 h-3.5" />
                         ) : (
-                          <ChevronDown className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                          <ChevronDown className="w-3.5 h-3.5" />
                         )}
-                        <Building2 className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onSelectCompany(company.id)}
+                        title={`Open ${company.name} overview & contacts`}
+                        className="flex items-center gap-1.5 min-w-0 flex-1 text-left"
+                      >
+                        <Building2
+                          className={`w-3.5 h-3.5 shrink-0 ${
+                            isCompanyActive ? 'text-sky-700' : 'text-stone-500'
+                          }`}
+                        />
                         <span className="text-xs font-semibold text-stone-800 truncate">
                           {company.name}
                         </span>
@@ -349,10 +355,24 @@ export function WorkspaceSidebar({
         </div>
       </div>
 
-      {/* Footer Hint */}
-      <div className="px-3.5 py-2.5 border-t border-stone-200/80 text-[11px] text-stone-400 flex items-center gap-1.5">
-        <Briefcase className="w-3 h-3 shrink-0" />
-        <span className="truncate">Each role owns its resume &amp; letter</span>
+      {/* Bottom Pinned Settings */}
+      <div className="p-2.5 border-t border-stone-200/80 shrink-0">
+        <button
+          type="button"
+          onClick={onSelectProfile}
+          className={`w-full px-2.5 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition-colors ${
+            view === 'profile'
+              ? 'bg-white text-stone-900 shadow-2xs border border-stone-200'
+              : 'text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 border border-transparent'
+          }`}
+        >
+          <Settings
+            className={`w-3.5 h-3.5 shrink-0 ${
+              view === 'profile' ? 'text-sky-700' : 'text-stone-500'
+            }`}
+          />
+          <span className="truncate">Settings</span>
+        </button>
       </div>
     </aside>
   );

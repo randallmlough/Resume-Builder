@@ -224,12 +224,61 @@ export const CreateSnapshotInputSchema = z.object({
   label: z.string().min(1).max(200),
 });
 
+export const ContactRelationshipSchema = z.enum([
+  'hiring_manager',
+  'decision_maker',
+  'recruiter',
+  'referral',
+  'interviewer',
+  'other',
+]);
+
+export const CONTACT_RELATIONSHIPS = [
+  { id: 'hiring_manager', label: 'Hiring Manager' },
+  { id: 'decision_maker', label: 'Decision Maker' },
+  { id: 'recruiter', label: 'Recruiter' },
+  { id: 'referral', label: 'Referral' },
+  { id: 'interviewer', label: 'Interviewer' },
+  { id: 'other', label: 'Other' },
+] as const;
+
+export const CreateContactInputSchema = z.object({
+  companyId: z.string().min(1),
+  name: z.string().min(1).max(200),
+  title: z.string().max(200).optional().default(''),
+  email: z.string().max(300).optional().default(''),
+  phone: z.string().max(100).optional().default(''),
+  linkedin: z.string().max(500).optional().default(''),
+  github: z.string().max(500).optional().default(''),
+  twitter: z.string().max(500).optional().default(''),
+  website: z.string().max(500).optional().default(''),
+  notes: z.string().optional().default(''),
+});
+
+export const UpdateContactInputSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  title: z.string().max(200).optional(),
+  email: z.string().max(300).optional(),
+  phone: z.string().max(100).optional(),
+  linkedin: z.string().max(500).optional(),
+  github: z.string().max(500).optional(),
+  twitter: z.string().max(500).optional(),
+  website: z.string().max(500).optional(),
+  notes: z.string().optional(),
+});
+
+export const LinkJobContactInputSchema = z.object({
+  contactId: z.string().min(1),
+  relationship: ContactRelationshipSchema.default('hiring_manager'),
+});
+
 export const ALLOWED_RECOMMENDATION_MIMES = [
   'application/pdf',
   'image/png',
   'image/jpeg',
 ] as const;
 
+export type ContactRelationship = z.infer<typeof ContactRelationshipSchema>;
 export type JobStage = z.infer<typeof JobStageSchema>;
 export type AttachmentTargetType = z.infer<typeof AttachmentTargetTypeSchema>;
 export type Contact = z.infer<typeof ContactSchema>;
@@ -278,8 +327,29 @@ export interface JobPostingRecord {
   coverLetterId: string | null;
   snapshotCount: number;
   attachmentCount: number;
+  contactCount: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CompanyContactRecord {
+  id: string;
+  companyId: string;
+  name: string;
+  title: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  github: string;
+  twitter: string;
+  website: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RoleContactRecord extends CompanyContactRecord {
+  relationship: ContactRelationship;
 }
 
 export interface ResumeSnapshotRecord {

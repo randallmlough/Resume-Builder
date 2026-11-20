@@ -8,6 +8,7 @@ import {
   Paperclip,
   Plus,
   Search,
+  Users,
 } from 'lucide-react';
 import {
   JOB_STAGES,
@@ -326,6 +327,15 @@ export function KanbanBoard({
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-50 text-sky-700">
                                   <Paperclip className="w-3 h-3" />
                                   {job.attachmentCount}
+                                </span>
+                              )}
+                              {job.contactCount > 0 && (
+                                <span
+                                  title={`${job.contactCount} linked ${job.contactCount === 1 ? 'contact' : 'contacts'}`}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700"
+                                >
+                                  <Users className="w-3 h-3" />
+                                  {job.contactCount}
                                 </span>
                               )}
                               {job.snapshotCount > 0 && (

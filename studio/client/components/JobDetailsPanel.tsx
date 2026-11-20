@@ -4,24 +4,45 @@ import {
   ExternalLink,
   GitBranch,
   History,
+  Pencil,
+  Plus,
   RefreshCw,
   RotateCcw,
   Trash2,
+  UserPlus,
+  Users,
+  X,
 } from 'lucide-react';
 import {
+  CONTACT_RELATIONSHIPS,
   JOB_STAGES,
+  type CompanyContactRecord,
+  type ContactRelationship,
   type JobPostingRecord,
   type JobStage,
   type ResumeRecord,
   type ResumeSnapshotRecord,
+  type RoleContactRecord,
 } from '@shared/schema';
 import { computeResumeDiffs } from '@shared/resumeDiff';
+import { ContactFormCard, ContactLinksBar, type ContactDraft } from './ContactFormCard';
+
+const RELATIONSHIP_BADGE: Record<ContactRelationship, string> = {
+  hiring_manager: 'bg-sky-50 text-sky-800 border-sky-200',
+  decision_maker: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+  recruiter: 'bg-amber-50 text-amber-800 border-amber-200',
+  referral: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  interviewer: 'bg-stone-100 text-stone-700 border-stone-200',
+  other: 'bg-stone-100 text-stone-600 border-stone-200',
+};
 
 interface JobDetailsPanelProps {
   job: JobPostingRecord;
   roleResume: ResumeRecord;
   masterResume: ResumeRecord | null;
   snapshots: ResumeSnapshotRecord[];
+  companyContacts: CompanyContactRecord[];
+  roleContacts: RoleContactRecord[];
   syncingMaster: boolean;
   onUpdateJob: (
     patch: Partial<
@@ -36,6 +57,11 @@ interface JobDetailsPanelProps {
   onCreateSnapshot: (label: string) => Promise<void>;
   onRestoreSnapshot: (snapshotId: string) => Promise<void>;
   onDeleteSnapshot: (snapshotId: string) => Promise<void>;
+  onCreateAndLinkContact: (draft: ContactDraft) => Promise<void>;
+  onUpdateContact: (contactId: string, draft: ContactDraft) => Promise<void>;
+  onLinkContact: (contactId: string, relationship: ContactRelationship) => Promise<void>;
+  onUnlinkContact: (contactId: string) => Promise<void>;
+  onOpenCompanyPage: () => void;
 }
 
 const inputCls =
@@ -46,6 +72,8 @@ export function JobDetailsPanel({
   roleResume,
   masterResume,
   snapshots,
+  companyContacts,
+  roleContacts,
   syncingMaster,
   onUpdateJob,
   onDeleteJob,
@@ -53,10 +81,24 @@ export function JobDetailsPanel({
   onCreateSnapshot,
   onRestoreSnapshot,
   onDeleteSnapshot,
+  onCreateAndLinkContact,
+  onUpdateContact,
+  onLinkContact,
+  onUnlinkContact,
+  onOpenCompanyPage,
 }: JobDetailsPanelProps) {
   const [snapshotLabel, setSnapshotLabel] = useState('');
   const [preserveSummary, setPreserveSummary] = useState(true);
   const [freezing, setFreezing] = useState(false);
+
+  const [addingContact, setAddingContact] = useState(false);
+  const [editingContactId, setEditingContactId] = useState<string | null>(null);
+  const [selectedExistingId, setSelectedExistingId] = useState('');
+  const [selectedRelationship, setSelectedRelationship] =
+    useState<ContactRelationship>('hiring_manager');
+
+  const linkedIds = new Set(roleContacts.map((c) => c.id));
+  const availableCompanyContacts = companyContacts.filter((c) => !linkedIds.has(c.id));
 
   const diffs = useMemo(() => {
     if (!masterResume) return [];
@@ -207,6 +249,190 @@ export function JobDetailsPanel({
             className="w-full p-2.5 text-xs leading-relaxed rounded-md border border-stone-200 bg-stone-50/70 focus:bg-white focus:border-sky-500 outline-none resize-y"
           />
         </div>
+      </div>
+
+      {/* Role Contacts (Hiring Manager / Decision Makers) */}
+      <div className="rounded-xl border border-stone-200 bg-white p-4 space-y-3">
+        <div className="space-y-1">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Users className="w-4 h-4 text-sky-700 shrink-0" />
+              <h3 className="text-sm font-semibold text-stone-900 truncate">
+                Role Contacts ({roleContacts.length})
+              </h3>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={onOpenCompanyPage}
+                className="h-7 px-2 rounded-md text-[11px] font-medium text-stone-500 hover:text-stone-900 hover:bg-stone-100"
+              >
+                Directory
+              </button>
+              {!addingContact && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingContactId(null);
+                    setAddingContact(true);
+                  }}
+                  className="h-7 px-2.5 rounded-md bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200/80 text-xs font-medium inline-flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  New
+                </button>
+              )}
+            </div>
+          </div>
+          <p className="text-[11px] text-stone-500">
+            Hiring manager, decision makers, recruiters, or referrals for this posting.
+          </p>
+        </div>
+
+        {/* Link existing contact from this company */}
+        {availableCompanyContacts.length > 0 && !addingContact && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <select
+              value={selectedExistingId}
+              onChange={(e) => setSelectedExistingId(e.target.value)}
+              className="flex-1 min-w-[140px] h-8 px-2 text-xs rounded-md border border-stone-200 bg-stone-50 focus:bg-white focus:border-sky-500 outline-none"
+            >
+              <option value="">Link existing {job.companyName} contact…</option>
+              {availableCompanyContacts.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                  {c.title ? ` — ${c.title}` : ''}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedRelationship}
+              onChange={(e) => setSelectedRelationship(e.target.value as ContactRelationship)}
+              className="h-8 px-2 text-xs rounded-md border border-stone-200 bg-stone-50 focus:bg-white focus:border-sky-500 outline-none"
+            >
+              {CONTACT_RELATIONSHIPS.map((rel) => (
+                <option key={rel.id} value={rel.id}>
+                  {rel.label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              disabled={!selectedExistingId}
+              onClick={async () => {
+                if (!selectedExistingId) return;
+                await onLinkContact(selectedExistingId, selectedRelationship);
+                setSelectedExistingId('');
+              }}
+              className="h-8 px-2.5 rounded-md bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium inline-flex items-center gap-1 disabled:opacity-40"
+            >
+              <UserPlus className="w-3 h-3" />
+              Link
+            </button>
+          </div>
+        )}
+
+        {addingContact && (
+          <ContactFormCard
+            showRelationship
+            submitLabel="Create & Link"
+            onSubmit={async (draft) => {
+              await onCreateAndLinkContact(draft);
+              setAddingContact(false);
+            }}
+            onCancel={() => setAddingContact(false)}
+          />
+        )}
+
+        {roleContacts.length === 0 && !addingContact ? (
+          <div className="text-xs text-stone-400 text-center py-3 border border-dashed border-stone-200 rounded-lg">
+            No contacts linked to this role yet.
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {roleContacts.map((contact) =>
+              editingContactId === contact.id ? (
+                <ContactFormCard
+                  key={contact.id}
+                  initial={contact}
+                  showRelationship
+                  submitLabel="Save Contact"
+                  onSubmit={async (draft) => {
+                    await onUpdateContact(contact.id, draft);
+                    if (draft.relationship && draft.relationship !== contact.relationship) {
+                      await onLinkContact(contact.id, draft.relationship);
+                    }
+                    setEditingContactId(null);
+                  }}
+                  onCancel={() => setEditingContactId(null)}
+                />
+              ) : (
+                <div
+                  key={contact.id}
+                  className="rounded-lg border border-stone-200 bg-stone-50/60 p-3 space-y-1.5"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs font-semibold text-stone-900">
+                          {contact.name}
+                        </span>
+                        <select
+                          value={contact.relationship}
+                          onChange={(e) =>
+                            void onLinkContact(contact.id, e.target.value as ContactRelationship)
+                          }
+                          aria-label={`Relationship for ${contact.name}`}
+                          className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border outline-none cursor-pointer ${
+                            RELATIONSHIP_BADGE[contact.relationship]
+                          }`}
+                        >
+                          {CONTACT_RELATIONSHIPS.map((rel) => (
+                            <option key={rel.id} value={rel.id}>
+                              {rel.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      {contact.title && (
+                        <div className="text-[11px] text-stone-500 mt-0.5">{contact.title}</div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddingContact(false);
+                          setEditingContactId(contact.id);
+                        }}
+                        title="Edit contact details"
+                        className="w-6 h-6 rounded inline-flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-white"
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void onUnlinkContact(contact.id)}
+                        title="Unlink contact from this role (keeps in company directory)"
+                        className="w-6 h-6 rounded inline-flex items-center justify-center text-stone-400 hover:text-red-600 hover:bg-red-50"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <ContactLinksBar contact={contact} />
+
+                  {contact.notes && (
+                    <p className="text-[11px] text-stone-600 pt-0.5 leading-relaxed">
+                      {contact.notes}
+                    </p>
+                  )}
+                </div>
+              )
+            )}
+          </div>
+        )}
       </div>
 
       {/* Master Resume Diff & Sync */}
