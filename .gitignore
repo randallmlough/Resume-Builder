@@ -34,3 +34,10 @@ data/
 
 # Local planning artifacts
 /docs/.local/
+
+# SQLite databases
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
