@@ -107,7 +107,7 @@ type Project struct {
 	Name        string   `json:"name"`
 	Hide        bool     `json:"hide,omitempty"`
 	Description string   `json:"description"`
-	Link        string   `json:"link,omitempty"`
+	Website     string   `json:"url,omitempty"`
 	Github      string   `json:"github,omitempty"`
 	Technology  []string `json:"technologies,omitempty"`
 	StartDate   string   `json:"startDate"`
