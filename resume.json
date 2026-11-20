@@ -8,14 +8,14 @@
     "github": "github.com/randallmlough",
     "website": "https://www.randyLough.com"
   },
-  "summary": "Senior full-stack product engineer who is comfortable moving between stacks to solve the problem in front of me. I enjoy work that starts without a clear path and calls for investigation and careful tradeoffs. My current interest is in AI, both in the products I build and in how engineering teams work with it. I use it to move faster and smarter.",
+  "summary": "Senior full-stack engineer with 8+ years of experience building web and mobile products in TypeScript, React, Go, and Python. Focused on AI-native interfaces and agent tool systems, along with the verification loops, lint gates, and test suites that keep agent-written code reliable in production.",
   "experience": [
     {
       "company": "Freelance and Consulting",
       "location": "Remote",
       "startDate": "June 2025",
       "endDate": "Present",
-      "overview": "Shopify storefront and custom Shopify Admin app.",
+      "overview": "",
       "technologies": ["React", "React Router", "Shopify Hydrogen", "TypeScript", "Storybook", "Playwright", "GraphQL", "Cloudflare Workers"],
       "website": "https://www.randylough.com",
       "positions": [
@@ -25,10 +25,10 @@
           "endDate": "December 2026 (expected)",
           "type": "part-time",
           "responsibilities": [
-            "Rebuilt the storefront on Shopify Hydrogen, covering catalog, search, cart, customer accounts, and checkout.",
-            "Built a CMS as a Shopify Admin app, so staff edit storefront content in the admin they already use.",
-            "Set up agent-assisted development with repo rules and custom lint gates on commit, push, and CI that hold agent output to human standards.",
-            "Added Storybook and Playwright end-to-end tests for cart, product, and checkout."
+            "Rebuilding the course's online storefront solo on Shopify Hydrogen using AI-assisted workflows, owning catalog, search, cart, customer accounts, and checkout end to end.",
+            "Building an embedded Shopify Admin CMS so staff can edit storefront content in the admin they use.",
+            "Holding agent-generated code to human PR quality through repo rules and custom lint gates enforced on commit, push, and CI.",
+            "Protecting core purchase flows (product, cart, and checkout) with Storybook component coverage and Playwright end-to-end tests."
           ]
         },
         {
@@ -37,9 +37,9 @@
           "endDate": "October 2025",
           "type": "part-time",
           "responsibilities": [
-            "Designed and built an inspection scheduler where appraisers could view, create, and edit inspections.",
-            "Defined the testing strategy across unit, integration, and Playwright end-to-end tests.",
-            "Built GitHub Actions CI/CD pipelines that supported daily production releases."
+            "Designed and built an inspection scheduler so appraisers can book, manage, and update inspections.",
+            "Set up the testing foundation across unit, integration, and Playwright end-to-end suites.",
+            "Built GitHub Actions CI/CD pipelines that made daily production releases routine and low-risk."
           ]
         }
       ]
@@ -58,11 +58,12 @@
           "endDate": "July 2026",
           "type": "full-time",
           "responsibilities": [
-            "Rebuilt the signup flow across web and native apps, covering account creation, checkout, and activation.",
-            "Instrumented the signup funnel so the team could find drop-off points and verify changes in conversion.",
-            "Updated the member chat interface for conversations with Duckbill's AI agent and added support for task-specific widgets.",
-            "Introduced AI-assisted coding workflows for the frontend: verification loops, lint rules, and Playwright end-to-end tests.",
-            "Built an internal documentation site covering triage, on-call, system behavior, and engineering practices, with AI workflows that kept it current as the codebase changed."
+            "Rebuilt the signup flow across web and React Native, spanning account creation, checkout, and activation.",
+            "Instrumented the signup funnel to pinpoint drop-off and validate experiments, driving ~32% more signups.",
+            "Evolved Duckbill's AI agent chat UI, adding interactive, task-specific widgets directly inside member chat.",
+            "Hardened member task flows by clarifying operator escalations and resolving edge cases across VIP tasks.",
+            "Rolled out AI-assisted frontend workflows combining context docs, lint rules, and Playwright E2E verification loops so engineers could ship faster with agents without sacrificing quality.",
+            "Built an internal engineering handbook (triage, on-call, architecture, practices) wired to AI workflows that automatically kept docs in sync as the codebase changed."
           ]
         }
       ]
@@ -78,10 +79,9 @@
           "startDate": "July 2025",
           "endDate": "September 2025",
           "responsibilities": [
-            "Led frontend for a company-wide redesign: built a documented component library and an HTMX request pattern for SPA-like navigation, working with design and product.",
-            "Planned and built Zena's AI agent chat UI from proof of concept through implementation. It became the base for every AI conversation in the product.",
-            "Replaced a static tool architecture with a typed object structure for defining tools, so AI agents could support a wider range of them.",
-            "Designed an entitlements system covering numeric limits and permissions, not just on/off feature flags."
+            "Took Zena's AI agent chat UI from initial prototype to production, establishing the foundation for every conversational workflow in the product.",
+            "Re-architected agent tool definitions from static configs into a typed object model, making it straightforward to expand agent capabilities safely.",
+            "Designed a flexible entitlements system supporting usage limits and granular permissions rather than simple on/off feature flags."
           ]
         },
         {
@@ -89,11 +89,10 @@
           "startDate": "October 2023",
           "endDate": "July 2025",
           "responsibilities": [
-            "Added OpenSearch-backed search for imported transactions.",
-            "Added GraphQL schema validation to CI and standardized error handling.",
-            "Started Zena's on-call program and refined the process before more engineers joined the rotation.",
-            "Presented the team's GraphQL-versus-REST architecture options and tradeoffs.",
-            "Ran weekly engineering retrospectives."
+            "Led frontend engineering for a company-wide redesign, partnering with design and product to ship a documented component library and an HTMX pattern for fast, SPA-like navigation.",
+            "Implemented OpenSearch-backed search so users could quickly query and filter imported transactions.",
+            "Hardened the API layer by adding GraphQL schema validation to CI, standardizing error handling, and leading the team's GraphQL-vs.-REST architecture review.",
+            "Stood up Zena's first on-call rotation and facilitated weekly engineering retrospectives, turning triage and delivery feedback into repeatable team playbooks."
           ]
         }
       ]
@@ -106,12 +105,22 @@
       "positions": [
         {
           "title": "Software Engineer",
-          "startDate": "October 2020",
+          "startDate": "June 2021",
           "endDate": "March 2023",
           "responsibilities": [
-            "Led a TypeScript and Next.js frontend rewrite that cut feature development cycles by 40%, and helped the engineering team adopt both.",
-            "Built an internal Go CLI used company-wide for developer workflows, such as setting up services and updating dependencies, with tests and a CI/CD pipeline.",
+            "Led a frontend rewrite in TypeScript and Next.js that cut feature delivery cycles by 40%, guiding the engineering team through adoption.",
+            "Built a company-wide Go CLI, backed by automated tests and CI/CD, to handle routine developer workflows like spinning up services and updating dependencies.",
             "Mentored junior engineers in Go and system design."
+          ]
+        },
+        {
+          "title": "Support Engineer",
+          "startDate": "October 2020",
+          "endDate": "June 2021",
+          "responsibilities": [
+            "Shipped self-service admin tools (like merging duplicate accounts and assigning primary accounts) that cut support ticket volume by 12%.",
+            "Partnered across teams to trace recurring customer issues to root causes and close workflow gaps.",
+            "Expanded automated test coverage around bug-prone workflows to keep regressions out of production."
           ]
         }
       ]
@@ -144,10 +153,9 @@
       "github": "https://github.com/randallmlough/just-plain-coffee",
       "hide": false,
       "items": [
-        "Built a headless Shopify storefront on Hydrogen, React Router 7, and TypeScript, with catalog, search, cart, accounts, orders, and subscriptions.",
-        "Built type-safe Storefront and Customer Account API integrations with GraphQL code generation.",
-        "Built the UI with Tailwind CSS, Base UI, and Storybook, with colocated stories and accessibility checks.",
-        "Established a pnpm/Turborepo monorepo with automated formatting, type-aware linting, type checks, Git hooks, and production build validation."
+        "Built a headless Shopify storefront with Hydrogen, React Router 7, and TypeScript supporting product discovery, cart, subscriptions, and order management.",
+        "Generated end-to-end type-safe Storefront and Customer Account API clients using GraphQL codegen.",
+        "Configured a pnpm and Turborepo monorepo with colocated Storybook stories, automated accessibility checks, Git hooks, type-aware linting, and production build validation."
       ]
     },
     {
@@ -156,10 +164,10 @@
       "technologies": ["Swift", "SwiftUI", "SwiftData", "CloudKit", "Maestro"],
       "url": "https://getcamelot.app",
       "items": [
-        "Built a SwiftUI iOS 26 app for tracking feeding, sleep, diapers, and daily check-ins, with SwiftData storage. Times are stored in UTC and shown in the child's time zone.",
-        "Built private sharing on CloudKit with a zone-wide CKShare per child and invite-only access. Caregivers' private check-ins stay in a separate zone and are never shared.",
-        "Wrote a CKSyncEngine sync layer for private and shared databases, with last-writer-wins conflicts, delete tombstones, and model work on a background ModelActor.",
-        "Added a sleep Live Activity pushed to other caregivers' Lock Screens through a Cloudflare Worker relay. Added Maestro end-to-end tests and TestFlight builds from version tags."
+        "Built a native SwiftUI iOS 26 app backed by SwiftData for tracking feeding, sleep, diapers, and daily check-ins, normalizing timestamps in UTC and rendering in the child's local time zone.",
+        "Implemented invite-only family sharing via per-child CloudKit zones (CKShare), isolating each caregiver's private check-ins in a separate unshared zone.",
+        "Engineered a custom CKSyncEngine layer spanning private and shared databases with last-writer-wins conflict resolution, delete tombstones, and background persistence on a ModelActor.",
+        "Built cross-caregiver sleep Live Activities delivered to Lock Screens via a Cloudflare Worker push relay, with Maestro E2E tests and tag-triggered TestFlight releases."
       ]
     },
     {
@@ -249,6 +257,13 @@
       "keywords": ["Django", "Flask", "Data Analysis"]
     },
     {
+      "name": "Swift",
+      "level": "Intermediate",
+      "years": "1 year",
+      "category": "Programming Languages",
+      "keywords": ["SwiftUI", "SwiftData", "CloudKit"]
+    },
+    {
       "name": "SQL",
       "level": "Advanced",
       "years": "5 years",
@@ -270,6 +285,13 @@
       "keywords": ["Next.js"]
     },
     {
+      "name": "React Native",
+      "level": "Advanced",
+      "years": "2 years",
+      "category": "Frameworks and Libraries",
+      "keywords": ["iOS", "Mobile"]
+    },
+    {
       "name": "Next.js",
       "level": "Advanced",
       "years": "5 years",
@@ -277,11 +299,39 @@
       "keywords": ["Next.js"]
     },
     {
+      "name": "Shopify Hydrogen",
+      "level": "Advanced",
+      "years": "1 year",
+      "category": "Frameworks and Libraries",
+      "keywords": ["React Router", "Storefront API"]
+    },
+    {
+      "name": "GraphQL",
+      "level": "Advanced",
+      "years": "3 years",
+      "category": "Frameworks and Libraries",
+      "keywords": ["Codegen", "Schema Validation"]
+    },
+    {
+      "name": "SwiftUI",
+      "level": "Intermediate",
+      "years": "1 year",
+      "category": "Frameworks and Libraries",
+      "keywords": ["SwiftData", "CloudKit"]
+    },
+    {
       "name": "Prisma",
       "level": "Advanced",
       "years": "5 years",
       "category": "Frameworks and Libraries",
       "keywords": []
+    },
+    {
+      "name": "Storybook",
+      "level": "Advanced",
+      "years": "2 years",
+      "category": "Frameworks and Libraries",
+      "keywords": ["Accessibility", "Component Testing"]
     },
     {
       "name": "Vitest",
@@ -361,6 +411,12 @@
       "name": "AWS",
       "level": "advanced",
       "years": "3 years",
+      "category": "CI/CD, Infra, Monitoring"
+    },
+    {
+      "name": "Cloudflare Workers",
+      "level": "intermediate",
+      "years": "1 year",
       "category": "CI/CD, Infra, Monitoring"
     },
     {
