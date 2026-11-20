@@ -16,7 +16,7 @@ function escapeTypstString(str: string): string {
 function convertInline(text: string): string {
   // Tokenize inline markdown constructs cleanly without nested regex corruption
   const tokenRegex =
-    /(`[^`]+`)|(\[([^\]]+)\]\(([^)]+)\))|(\*\*([^*]+)\*\*)|(__([^_]+)__)|(\*([^*]+)\*)|(_([^_]+)_)/g;
+    /(`[^`]+`)|(\[([^\]]+)\]\(([^)]+)\))|(\*\*\*([^*]+)\*\*\*)|(\*\*([^*]+)\*\*)|(__([^_]+)__)|(\*([^*]+)\*)|(_([^_]+)_)/g;
 
   let result = '';
   let lastIndex = 0;
@@ -36,13 +36,16 @@ function convertInline(text: string): string {
       const label = convertInline(match[3]);
       const dest = escapeTypstString(match[4].trim());
       result += `#link("${dest}")[${label}]`;
-    } else if (match[5] || match[7]) {
+    } else if (match[5]) {
+      // Bold + Italic
+      result += `#strong[#emph[${convertInline(match[6])}]]`;
+    } else if (match[7] || match[9]) {
       // Bold
-      const inner = match[6] ?? match[8];
+      const inner = match[8] ?? match[10];
       result += `#strong[${convertInline(inner)}]`;
-    } else if (match[9] || match[11]) {
+    } else if (match[11] || match[13]) {
       // Italic
-      const inner = match[10] ?? match[12];
+      const inner = match[12] ?? match[14];
       result += `#emph[${convertInline(inner)}]`;
     }
 
